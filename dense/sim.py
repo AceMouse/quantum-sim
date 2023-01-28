@@ -1,9 +1,10 @@
 import numpy as np
 import math
 import cmath
-_0 = np.array([1,0], dtype=complex)
-_1 = np.array([0,1], dtype=complex)
-
+_0     = np.array([1,0], dtype=complex)
+_1     = np.array([0,1], dtype=complex)
+_plus  = (_0 + _1)/math.sqrt(2)
+_minus = (_0 - _1)/math.sqrt(2)
 I = np.eye(2, dtype=complex)
 X = np.array([[0,1],[1,0]], dtype=complex)
 H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
@@ -18,6 +19,10 @@ def parse_state(state_string):
             m = _1
         elif bit == '0':
             m = _0
+        elif bit == '+':
+            m = _plus
+        elif bit == '-':
+            m = _minus
         else:
             raise Exception(f'Parse Error "{bit}"')
 
@@ -41,7 +46,7 @@ def measure(state):
 
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
-
+'''
 for n in range(10):
     state = np.dot(parse_state("1"),R_n(n))
     print_measurement(state)
@@ -52,4 +57,4 @@ state_string = input()
 state = parse_state(state_string)
 print_state(state)
 print_measurement(state)
-'''
+
