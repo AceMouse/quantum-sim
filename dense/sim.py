@@ -1,17 +1,21 @@
 import numpy as np
 import math
 import cmath
+
 _0     = np.array([1,0], dtype=complex)
 _1     = np.array([0,1], dtype=complex)
 _plus  = (_0 + _1)/math.sqrt(2)
 _minus = (_0 - _1)/math.sqrt(2)
+
 I = np.eye(2, dtype=complex)
 X = np.array([[0,1],[1,0]], dtype=complex)
 H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
+def R(angle):
+    return np.array([[1,0],[0,cmath.exp(1j*angle)]], dtype=complex)
+
 def R_n(n):
-    N = math.pow(2,n)
-    e = cmath.exp((2*math.pi*1j)/N)
-    return np.array([[1,0],[0,e]], dtype=complex)
+    return R(2*math.pi/math.pow(2,n))
+
 def parse_state(state_string):
     state = None
     for bit in state_string:    
@@ -46,13 +50,13 @@ def measure(state):
 
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
-'''
+
 for n in range(10):
     state = np.dot(parse_state("1"),R_n(n))
     print_measurement(state)
     print_state(state)
 
-'''
+
 state_string = input()
 state = parse_state(state_string)
 print_state(state)
