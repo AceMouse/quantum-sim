@@ -94,18 +94,18 @@ def print_measurement(state, shorten=True):
 
 
 state_string = input()
-print("CX(2,1)")
+print("CX(4,2)")
 state = parse_state(state_string)
 (size,) = state.shape
 n = (size-1).bit_length()
 print_state(state)
-state = np.dot(state,C(X,2,1,n))
+state = np.dot(state,C(X,4,2,n))
 print_state(state)
 print()
-print("CX(1,3)")
+print("CX(2,5)")
 state = parse_state(state_string)
 print_state(state)
-state = np.dot(state,C(X,1,3,n))
+state = np.dot(state,C(X,2,5,n))
 print_state(state)
 '''
 for n in range(10):
