@@ -24,17 +24,25 @@ def C(U, c, t, n):
     ket1 = parse_braket("|1>")
     proj0 = ket0*bra0
     proj1 = ket1*bra1
+    _min = min(c,t)
+    _max = max(c,t)
     before = np.array([1],dtype=complex)
-    for i in range(c-1):
+    for i in range(_min-1):
         before = np.kron(before,I)
     uninvolved = np.array([1],dtype=complex)
-    for i in range(t-c-1):
+    for i in range(_max-_min-1):
         uninvolved = np.kron(uninvolved,I)
     after = np.array([1],dtype=complex)
-    for i in range(n-t):
+    for i in range(n-_max):
         after = np.kron(after,I)
-    a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(I,after))))
-    b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(U,after))))
+    if c < t:
+        a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(I,after))))
+        b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(U,after))))
+    elif t < c:
+        a = np.kron(before,np.kron(I,np.kron(uninvolved,np.kron(proj0,after))))
+        b = np.kron(before,np.kron(U,np.kron(uninvolved,np.kron(proj1,after))))
+    else:
+        raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
     return a+b
 
 def parse_braket(dirac):
@@ -86,12 +94,12 @@ def print_measurement(state, shorten=True):
 
 
 state_string = input()
-print("CX(1,2)")
+print("CX(2,1)")
 state = parse_state(state_string)
 (size,) = state.shape
 n = (size-1).bit_length()
 print_state(state)
-state = np.dot(state,C(X,1,2,n))
+state = np.dot(state,C(X,2,1,n))
 print_state(state)
 print()
 print("CX(1,3)")
