@@ -2,10 +2,10 @@ import numpy as np
 import math
 import cmath
 
-_0     = np.array([1,0], dtype=complex)
-_1     = np.array([0,1], dtype=complex)
-_plus  = (_0 + _1)/math.sqrt(2)
-_minus = (_0 - _1)/math.sqrt(2)
+_0     = [np.array([[1],[0]], dtype=complex), np.array([1,0], dtype=complex)]
+_1     = [np.array([[0],[1]], dtype=complex), np.array([0,1], dtype=complex)]
+_plus  = [(_0[i] + _1[i])/math.sqrt(2) for i in range(len(_0))]
+_minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 
 I = np.eye(2, dtype=complex)
 X = np.array([[0,1],[1,0]], dtype=complex)
@@ -16,26 +16,59 @@ def R(angle):
 def R_n(n):
     return R(2*math.pi/math.pow(2,n))
 
-def parse_state(state_string):
-    state = None
-    for bit in state_string:    
+# https://quantumcomputing.stackexchange.com/a/4255 <- math
+def C(U, c, t, n): 
+    bra0 = parse_braket("<0|")
+    ket0 = parse_braket("|0>")
+    bra1 = parse_braket("<1|")
+    ket1 = parse_braket("|1>")
+    proj0 = ket0*bra0
+    proj1 = ket1*bra1
+    before = np.array([1],dtype=complex)
+    for i in range(c-1):
+        before = np.kron(before,I)
+    uninvolved = np.array([1],dtype=complex)
+    for i in range(t-c-1):
+        uninvolved = np.kron(uninvolved,I)
+    after = np.array([1],dtype=complex)
+    for i in range(n-t):
+        after = np.kron(after,I)
+    a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(I,after))))
+    b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(U,after))))
+    return a+b
+
+def parse_braket(dirac):
+    if len(dirac) > 2 and dirac[0] == '|' and dirac[-1] == '>':
+        dirac = dirac[1:-1]
+        ket = 1
+    elif len(dirac) > 2 and dirac[0] == '<' and dirac[-1] == '|':
+        dirac = dirac[1:-1]
+        ket = 0
+    else:
+        ket = 1
+        
+    vec = None
+    for bit in dirac:    
         if bit == '1':
-            m = _1
+            m = _1[ket]
         elif bit == '0':
-            m = _0
+            m = _0[ket]
         elif bit == '+':
-            m = _plus
+            m = _plus[ket]
         elif bit == '-':
-            m = _minus
+            m = _minus[ket]
         else:
             raise Exception(f'Parse Error "{bit}"')
 
-        if state is None:
-            state = m
+        if vec is None:
+            vec = m
         else: 
-            state = np.kron(state, m)
+            vec = np.kron(vec, m)
 
-    return state
+    return vec
+
+def parse_state(state_string):
+    return parse_braket(state_string)
 
 def print_state(state, shorten=True, postfix=''):
     (size,) = state.shape
@@ -51,14 +84,31 @@ def measure(state):
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
 
+
+state_string = input()
+print("CX(1,2)")
+state = parse_state(state_string)
+(size,) = state.shape
+n = (size-1).bit_length()
+print_state(state)
+state = np.dot(state,C(X,1,2,n))
+print_state(state)
+print()
+print("CX(1,3)")
+state = parse_state(state_string)
+print_state(state)
+state = np.dot(state,C(X,1,3,n))
+print_state(state)
+'''
 for n in range(10):
     state = np.dot(parse_state("1"),R_n(n))
     print_measurement(state)
     print_state(state)
 
 
+
 state_string = input()
 state = parse_state(state_string)
 print_state(state)
 print_measurement(state)
-
+'''
