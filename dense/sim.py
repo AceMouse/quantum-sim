@@ -120,7 +120,6 @@ def interpret(path, state_string):
                 g = R_n(int(instrs[i+1][1:]))
             c = int(instrs[i+2])
             t = int(instrs[i+3])
-            print(f"C({g}, {c}, {t}, {n})")
             state = np.dot(state, C(g,c,t,n))
             i+=4
             continue
@@ -132,7 +131,6 @@ def interpret(path, state_string):
         elif instrs[i][0] == 'R':
             g = R_n(int(instrs[i][1:]))
         t = int(instrs[i+1])
-        print(f"U({g}, {t}, {n})")
         state = np.dot(state, U(g,t,n))
         i += 2
     print_state(state)
