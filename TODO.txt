@@ -1,4 +1,3 @@
 - specify compile output path in argv
-- add ability to apply one qubit gate to specific qubit in multi qubit state
 - add interpreter loop
 

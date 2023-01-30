@@ -16,14 +16,21 @@ def R(angle):
 def R_n(n):
     return R(2*math.pi/math.pow(2,n))
 
+def U(U, t, n): 
+    proj0 = _0[1]*_0[0]
+    proj1 = _1[1]*_1[0]
+    before = np.array([1],dtype=complex)
+    for i in range(t-1):
+        before = np.kron(before,I)
+    after = np.array([1],dtype=complex)
+    for i in range(n-t):
+        after = np.kron(after,I)
+    return np.kron(before,np.kron(U,after))
+    
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
 def C(U, c, t, n): 
-    bra0 = parse_braket("<0|")
-    ket0 = parse_braket("|0>")
-    bra1 = parse_braket("<1|")
-    ket1 = parse_braket("|1>")
-    proj0 = ket0*bra0
-    proj1 = ket1*bra1
+    proj0 = _0[1]*_0[0]
+    proj1 = _1[1]*_1[0]
     _min = min(c,t)
     _max = max(c,t)
     before = np.array([1],dtype=complex)
@@ -107,6 +114,12 @@ state = parse_state(state_string)
 print_state(state)
 state = np.dot(state,C(X,2,5,n))
 print_state(state)
+print()
+print("H(3)")
+state = parse_state(state_string)
+print_measurement(state)
+state = np.dot(state,U(H,3,n))
+print_measurement(state)
 '''
 for n in range(10):
     state = np.dot(parse_state("1"),R_n(n))
