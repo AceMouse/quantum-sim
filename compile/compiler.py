@@ -34,7 +34,7 @@ def compile(path):
         if U is None: 
             continue
         if not c is None:
-            instructions.append('c')
+            instructions.append('C')
         instructions.append(U)
         if not c is None:
             instructions.append(c+1)

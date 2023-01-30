@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import cmath
+import sys
 
 _0     = [np.array([[1],[0]], dtype=complex), np.array([1,0], dtype=complex)]
 _1     = [np.array([[0],[1]], dtype=complex), np.array([0,1], dtype=complex)]
@@ -100,6 +101,46 @@ def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
 
 
+def interpret(path, state_string):
+    state = parse_state(state_string)
+    (size,) = state.shape
+    n = (size-1).bit_length()
+    with open(path, 'r') as out:
+        instrs = out.read().splitlines()
+    
+    i = 0
+    while i < len(instrs):
+        g = None
+        if instrs[i] == 'C':
+            if instrs[i+1] == 'H':
+                g = H
+            elif instrs[i+1] == 'X':
+                g = X
+            elif instrs[i+1][0] == 'R':
+                g = R_n(int(instrs[i+1][1:]))
+            c = int(instrs[i+2])
+            t = int(instrs[i+3])
+            print(f"C({g}, {c}, {t}, {n})")
+            state = np.dot(state, C(g,c,t,n))
+            i+=4
+            continue
+        
+        if instrs[i] == 'H':
+            g = H
+        elif instrs[i] == 'X':
+            g = X
+        elif instrs[i][0] == 'R':
+            g = R_n(int(instrs[i][1:]))
+        t = int(instrs[i+1])
+        print(f"U({g}, {t}, {n})")
+        state = np.dot(state, U(g,t,n))
+        i += 2
+    print_state(state)
+    print_measurement(state)
+
+
+interpret(sys.argv[1], sys.argv[2])
+'''
 state_string = input()
 print("CX(4,2)")
 state = parse_state(state_string)
@@ -120,7 +161,7 @@ state = parse_state(state_string)
 print_measurement(state)
 state = np.dot(state,U(H,3,n))
 print_measurement(state)
-'''
+
 for n in range(10):
     state = np.dot(parse_state("1"),R_n(n))
     print_measurement(state)
