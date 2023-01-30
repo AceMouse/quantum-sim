@@ -1,10 +1,10 @@
 # quantum-sim
 Simulating quantum-circuits in different ways
 
-# compile
+# compile & run
 ```
-❯ python3 compile/compiler.py cirquits/QFT2
-❯ cat cirquits/QFT2.out
+❯ python3 compile/compiler.py circuits/QFT2
+❯ cat circuits/QFT2.out
 H
 1
 C
@@ -13,7 +13,7 @@ R2
 1
 H
 2
-❯ python dense/sim.py cirquits/QFT2.out 10
+❯ python3 dense/sim.py circuits/QFT2.out 10
 # state probability
 0 |00>   (0.4999999999999999+0j)
 1 |01>   (0.4999999999999999+0j)

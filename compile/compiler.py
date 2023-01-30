@@ -6,8 +6,8 @@ def T(l):
 
 def compile(path):
     tokens = []
-    with open(path, 'r') as cirq:
-        lines = cirq.readlines()
+    with open(path, 'r') as circ:
+        lines = circ.readlines()
         for i,line in enumerate(lines):
             tokens.append(re.findall('..',line))
     instructions = []

@@ -1,3 +1,2 @@
 - specify compile output path in argv
-- add interpreter loop
 
