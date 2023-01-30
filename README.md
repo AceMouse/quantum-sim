@@ -3,6 +3,9 @@ Simulating quantum-circuits in different ways
 
 # compile & run
 ```
+❯ cat circuits/QFT2
+--H-R2--
+----C-H-
 ❯ python3 compile/compiler.py circuits/QFT2
 ❯ cat circuits/QFT2.out
 H
