@@ -17,6 +17,7 @@ def R(angle):
 def R_n(n):
     return R(2*math.pi/math.pow(2,n))
 
+#return a matrix that applies gate U to the t'th qubit in an n qubit state.
 def U(U, t, n): 
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
@@ -29,6 +30,7 @@ def U(U, t, n):
     return np.kron(before,np.kron(U,after))
     
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
+#return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
 def C(U, c, t, n): 
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
@@ -136,39 +138,4 @@ def interpret(path, state_string):
     print_state(state)
     print_measurement(state)
 
-
 interpret(sys.argv[1], sys.argv[2])
-'''
-state_string = input()
-print("CX(4,2)")
-state = parse_state(state_string)
-(size,) = state.shape
-n = (size-1).bit_length()
-print_state(state)
-state = np.dot(state,C(X,4,2,n))
-print_state(state)
-print()
-print("CX(2,5)")
-state = parse_state(state_string)
-print_state(state)
-state = np.dot(state,C(X,2,5,n))
-print_state(state)
-print()
-print("H(3)")
-state = parse_state(state_string)
-print_measurement(state)
-state = np.dot(state,U(H,3,n))
-print_measurement(state)
-
-for n in range(10):
-    state = np.dot(parse_state("1"),R_n(n))
-    print_measurement(state)
-    print_state(state)
-
-
-
-state_string = input()
-state = parse_state(state_string)
-print_state(state)
-print_measurement(state)
-'''
