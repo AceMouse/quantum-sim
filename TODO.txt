@@ -1,2 +1,12 @@
+general:
+- implement multiple control gates
+- execute independant gates in parallel
+
+compiler:
 - specify compile output path in argv
+- optimise away consecutive non-control gates equal to Identity
+- optimise packing of circuits
+
+sim:
+
 
