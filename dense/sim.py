@@ -109,7 +109,7 @@ def interpret(path, state_string):
     n = (size-1).bit_length()
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
-    
+    ops = []
     i = 0
     while i < len(instrs):
         g = None
@@ -122,7 +122,9 @@ def interpret(path, state_string):
                 g = R_n(int(instrs[i+1][1:]))
             c = int(instrs[i+2])
             t = int(instrs[i+3])
-            state = np.dot(state, C(g,c,t,n))
+            op = C(g,c,t,n) 
+            state = np.dot(state, op)
+            ops.append(op)
             i+=4
             continue
         
@@ -133,9 +135,18 @@ def interpret(path, state_string):
         elif instrs[i][0] == 'R':
             g = R_n(int(instrs[i][1:]))
         t = int(instrs[i+1])
-        state = np.dot(state, U(g,t,n))
+        op = U(g,t,n)
+        state = np.dot(state, op)
+        ops.append(op)
         i += 2
     print_state(state)
     print_measurement(state)
+    return (state, ops)
 
-interpret(sys.argv[1], sys.argv[2])
+def reverse(state, ops):
+    for op in reversed(ops):
+        state = np.dot(state, op.conj().T)
+    print_state(state)
+    print_measurement(state)
+
+reverse(*interpret(sys.argv[1], sys.argv[2]))
