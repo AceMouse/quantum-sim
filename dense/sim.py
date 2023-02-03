@@ -102,14 +102,10 @@ def measure(state):
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
 
-
-def interpret(path, state_string):
-    state = parse_state(state_string)
-    (size,) = state.shape
-    n = (size-1).bit_length()
+def combine(path, n):
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
-    ops = []
+    m = 1
     i = 0
     while i < len(instrs):
         g = None
@@ -123,8 +119,7 @@ def interpret(path, state_string):
             c = int(instrs[i+2])
             t = int(instrs[i+3])
             op = C(g,c,t,n) 
-            state = np.dot(state, op)
-            ops.append(op)
+            m = np.dot(m, op)
             i+=4
             continue
         
@@ -136,17 +131,23 @@ def interpret(path, state_string):
             g = R_n(int(instrs[i][1:]))
         t = int(instrs[i+1])
         op = U(g,t,n)
-        state = np.dot(state, op)
-        ops.append(op)
+        m = np.dot(m, op)
         i += 2
+    return m
+
+def interpret(path, state_string, reverse = False):
+    state = parse_state(state_string)
+    print("before:")
     print_state(state)
     print_measurement(state)
-    return (state, ops)
-
-def reverse(state, ops):
-    for op in reversed(ops):
-        state = np.dot(state, op.conj().T)
+    (size,) = state.shape
+    n = (size-1).bit_length()
+    m = combine(path, n)
+    if reverse:
+        m = m.conj().T
+    state = np.dot(state, m)
+    print("after:")
     print_state(state)
     print_measurement(state)
 
-reverse(*interpret(sys.argv[1], sys.argv[2]))
+interpret(sys.argv[1], sys.argv[2], len(sys.argv) >= 4 and sys.argv[3] == '-r')
