@@ -8,7 +8,7 @@ _1     = [np.array([[0],[1]], dtype=complex), np.array([0,1], dtype=complex)]
 _plus  = [(_0[i] + _1[i])/math.sqrt(2) for i in range(len(_0))]
 _minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 
-I = np.eye(2, dtype=complex)
+I = np.array([[1,0],[0,1]], dtype=complex)
 X = np.array([[0,1],[1,0]], dtype=complex)
 H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
 def R(angle):
@@ -102,11 +102,12 @@ def measure(state):
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
 
-def combine(path, n):
+def combine(path):
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
     m = 1
-    i = 0
+    n = int(instrs[0])
+    i = 1
     while i < len(instrs):
         g = None
         if instrs[i] == 'C':
@@ -114,6 +115,8 @@ def combine(path, n):
                 g = H
             elif instrs[i+1] == 'X':
                 g = X
+            elif instrs[i+1] == 'I':
+                g = I
             elif instrs[i+1][0] == 'R':
                 g = R_n(int(instrs[i+1][1:]))
             c = int(instrs[i+2])
@@ -127,27 +130,62 @@ def combine(path, n):
             g = H
         elif instrs[i] == 'X':
             g = X
+        elif instrs[i] == 'I':
+            g = I
         elif instrs[i][0] == 'R':
             g = R_n(int(instrs[i][1:]))
         t = int(instrs[i+1])
         op = U(g,t,n)
         m = np.dot(m, op)
         i += 2
-    return m
+    return n, m
 
 def interpret(path, state_string, reverse = False):
     state = parse_state(state_string)
     print("before:")
     print_state(state)
     print_measurement(state)
-    (size,) = state.shape
-    n = (size-1).bit_length()
-    m = combine(path, n)
+    n, m = combine(path)
     if reverse:
         m = m.conj().T
     state = np.dot(state, m)
     print("after:")
     print_state(state)
     print_measurement(state)
+    calc_vn_entropy(path, reverse = reverse)
+
+def calc_vn_entropy(path, reverse = False, k = -1):
+    n, m = combine(path)
+    if reverse:
+        m = m.conj().T
+    psi = format(0,f'0{n}b')
+    psi_ket = np.atleast_2d(np.dot(m, parse_state(f'|{psi}>'))).T
+    psi_bra = np.atleast_2d(psi_ket.conj()).T
+    print("Von Neumann entropy:")
+    if k == -1:
+        k = n>>1
+    # sum_j_k+1.. =0 -> 1 (<j_k+1|...<j_n|)|psi><psi|(|j_k+1>...|j_n>)
+    sum = np.zeros(((n>>1)<<1,(n>>1)<<1),dtype=complex)
+    for x in range(1<<k):
+        j = format(x,f'0{k}b')
+        jket = parse_state(f'|{j}>')
+        jbra = parse_state(f'<{j}|')
+
+        left = np.outer(jbra,psi_ket)
+        right = np.outer(psi_bra,jket)
+        total = np.dot(left,right)
+        sum += total
+    roh_a = sum/(1<<k)
+
+    # -sum_k(lambda_k ln lambda_k)
+    eigen_values, eigen_vectors = np.linalg.eig(roh_a)
+    entropy = 0
+    for e in eigen_values:
+        entropy -= e * np.log(e)
+    print(entropy)
+
+
+
+
 
 interpret(sys.argv[1], sys.argv[2], len(sys.argv) >= 4 and sys.argv[3] == '-r')

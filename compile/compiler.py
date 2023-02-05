@@ -10,7 +10,7 @@ def compile(path):
         lines = circ.readlines()
         for i,line in enumerate(lines):
             tokens.append(re.findall('..',line))
-    instructions = []
+    instructions = [f'{len(tokens)}']
     for col in T(tokens):
         c = None
         t = None
@@ -26,7 +26,7 @@ def compile(path):
                 U = m.group()
                 t = qubit
                 continue
-            m = re.search('[HX]-',token)
+            m = re.search('[IHX]-',token)
             if not m is None:
                 U = m.group()[0]
                 t = qubit
