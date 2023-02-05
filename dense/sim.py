@@ -83,12 +83,13 @@ def parse_braket(dirac):
         else: 
             vec = np.kron(vec, m)
 
-    return vec
+    return np.atleast_2d(vec)
 
 def parse_state(state_string):
     return parse_braket(state_string)
 
 def print_state(state, shorten=True, postfix=''):
+    state = state.flatten()
     (size,) = state.shape
     size -= 1
     print(f'{"#".rjust(len(str(size)))} {"state".ljust(size.bit_length()+2)} probability')
@@ -152,16 +153,11 @@ def interpret(path, state_string, reverse = False):
     print("after:")
     print_state(state)
     print_measurement(state)
-    calc_vn_entropy(path, reverse = reverse)
+    vn_entropy_from_state(state, n, reverse = reverse)
 
-def calc_vn_entropy(path, reverse = False, k = -1):
-    n, m = combine(path)
-    if reverse:
-        m = m.conj().T
-    psi = format(0,f'0{n}b')
-    psi_ket = np.atleast_2d(np.dot(m, parse_state(f'|{psi}>'))).T
-    psi_bra = np.atleast_2d(psi_ket.conj()).T
-    print("Von Neumann entropy:")
+def vn_entropy_from_state(state, n, reverse = False, k = -1):
+    psi_ket = state
+    psi_bra = psi_ket.conj().T
     if k == -1:
         k = n>>1
     # sum_j_k+1.. =0 -> 1 (<j_k+1|...<j_n|)|psi><psi|(|j_k+1>...|j_n>)
@@ -171,9 +167,10 @@ def calc_vn_entropy(path, reverse = False, k = -1):
         jket = parse_state(f'|{j}>')
         jbra = parse_state(f'<{j}|')
 
-        left = np.outer(jbra,psi_ket)
-        right = np.outer(psi_bra,jket)
-        total = np.dot(left,right)
+        left = jbra * psi_ket
+        right = psi_bra * jket
+        total = np.dot(left, right)
+        #print(f'<j|psi><psi|j> = \n{total}')
         sum += total
     roh_a = sum/(1<<k)
 
@@ -182,10 +179,20 @@ def calc_vn_entropy(path, reverse = False, k = -1):
     entropy = 0
     for e in eigen_values:
         entropy -= e * np.log(e)
+    #print("rho =")
+    #print(roh_a)
+    print("Von Neumann entropy:")
     print(entropy)
 
+def vn_entropy_from_circuit(path, reverse = False, k = -1):
+    n, m = combine(path)
+    if reverse:
+        m = m.conj().T
+    psi = format(0,f'0{n}b')
+    state = np.dot(parse_state(f'|{psi}>'), m)
+    vn_entropy_from_state(state, n, reverse, k)
 
-
-
-
+#vn_entropy_from_state((parse_state('|00>')+1j*parse_state('|11>'))*(1/math.sqrt(2)),2)
+#vn_entropy_from_circuit('circuits/I4.out')
 interpret(sys.argv[1], sys.argv[2], len(sys.argv) >= 4 and sys.argv[3] == '-r')
+#print(parse_braket(input()))

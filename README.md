@@ -56,5 +56,5 @@ after:
 # state probability
 2 |10>   100.0%
 Von Neumann entropy:
-(0.6931471805599454+0j)
+(0.6931471805599455+0j)
 ```
