@@ -9,6 +9,7 @@ use flag `-r` for reverse aplication of the circuit
 ----C-H-
 ❯ python3 compile/compiler.py circuits/QFT2
 ❯ cat circuits/QFT2.out
+2
 H
 1
 C
@@ -34,6 +35,8 @@ after:
 1 |01>   25.0%
 2 |10>   25.0%
 3 |11>   25.0%
+Von Neumann entropy:
+(0.6931471805599454+0j)
 ❯ python3 dense/sim.py circuits/QFT2.out '|-+>' -r
 before:
 # state probability
@@ -52,4 +55,6 @@ after:
 2 |10>   (0.9999999999999996+0j)
 # state probability
 2 |10>   100.0%
+Von Neumann entropy:
+(0.6931471805599454+0j)
 ```
