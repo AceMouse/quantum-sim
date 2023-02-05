@@ -178,7 +178,7 @@ def vn_entropy_from_state(state, n, reverse = False, k = -1):
     eigen_values, eigen_vectors = np.linalg.eig(roh_a)
     entropy = 0
     for e in eigen_values:
-        entropy -= e * np.log(e)
+        entropy -= e * np.log2(e)
     #print("rho =")
     #print(roh_a)
     print("Von Neumann entropy:")

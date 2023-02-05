@@ -36,7 +36,7 @@ after:
 2 |10>   25.0%
 3 |11>   25.0%
 Von Neumann entropy:
-(0.6931471805599454+0j)
+(1.0000000000000002+0j)
 ❯ python3 dense/sim.py circuits/QFT2.out '|-+>' -r
 before:
 # state probability
@@ -56,5 +56,5 @@ after:
 # state probability
 2 |10>   100.0%
 Von Neumann entropy:
-(0.6931471805599455+0j)
+(1.0000000000000004+0j)
 ```
