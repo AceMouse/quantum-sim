@@ -141,58 +141,108 @@ def combine(path):
         i += 2
     return n, m
 
-def interpret(path, state_string, reverse = False):
+def interpret(path, state_string, reverse = False, debug=False):
     state = parse_state(state_string)
-    print("before:")
-    print_state(state)
-    print_measurement(state)
+    if debug:
+        print("before:")
+        print_state(state)
+        print_measurement(state)
     n, m = combine(path)
     if reverse:
         m = m.conj().T
     state = np.dot(state, m)
-    print("after:")
-    print_state(state)
+    if debug:
+        print("after:")
+        print_state(state)
     print_measurement(state)
-    vn_entropy_from_state(state, n, reverse = reverse)
+    entropy = vn_entropy_from_state(state, n, reverse = reverse, debug = debug)
+    if not debug:
+        print("Von Neumann entropy:")
+        print(entropy)
 
-def vn_entropy_from_state(state, n, reverse = False, k = -1):
+def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
     psi_ket = state
     psi_bra = psi_ket.conj().T
     if k == -1:
         k = n>>1
-    # sum_j_k+1.. =0 -> 1 (<j_k+1|...<j_n|)|psi><psi|(|j_k+1>...|j_n>)
-    sum = np.zeros(((n>>1)<<1,(n>>1)<<1),dtype=complex)
+    before = np.array([1],dtype=complex)
+    for i in range(n-k):
+        before = np.kron(before,I)
+
+    # sum_j_k+1.. =0 -> 1 (<I^k|<j_k+1|...<j_n|)|psi><psi|(|I^k>|j_k+1>...|j_n>)
+    roh_a = None 
     for x in range(1<<k):
         j = format(x,f'0{k}b')
-        jket = parse_state(f'|{j}>')
-        jbra = parse_state(f'<{j}|')
-
-        left = jbra * psi_ket
-        right = psi_bra * jket
+        jket = np.kron(before, parse_state(f'|{j}>'))
+        jbra = jket.conj().T
+        #print(jbra)
+        #print(psi_ket)
+        #print(psi_bra)
+        #print(jket)
+        left = np.matmul(jbra.conj().T, psi_ket.conj().T)
+        right = np.matmul(psi_bra.conj().T, jket.conj().T)
         total = np.dot(left, right)
-        #print(f'<j|psi><psi|j> = \n{total}')
-        sum += total
-    roh_a = sum/(1<<k)
-
+        #print(f'<{j}|00><00|{j}> = \n{total}')
+        if roh_a is None:
+            roh_a = total
+        else:
+            roh_a += total
+    if debug:
+        print("rho_a: ")
+        print(np.round(roh_a,4))
     # -sum_k(lambda_k ln lambda_k)
     eigen_values, eigen_vectors = np.linalg.eig(roh_a)
+    if debug:
+        print("eigen values (sorted): ")
+        print(np.round(sorted(eigen_values, reverse =True), 4))
     entropy = 0
     for e in eigen_values:
-        entropy -= e * np.log2(e)
-    #print("rho =")
-    #print(roh_a)
-    print("Von Neumann entropy:")
-    print(entropy)
+        entropy -= e * np.log2(e + 1e-10)
+    if debug:
+        print("Von Neumann entropy: ")
+        print(entropy)
+    return entropy
 
-def vn_entropy_from_circuit(path, reverse = False, k = -1):
+
+def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False):
     n, m = combine(path)
     if reverse:
         m = m.conj().T
-    psi = format(0,f'0{n}b')
-    state = np.dot(parse_state(f'|{psi}>'), m)
-    vn_entropy_from_state(state, n, reverse, k)
+    z = 1
+    if repeat:
+        z = 1<<n
+    max_entropy = -1000
+    input = ''
+    for x in range(z):
+        psi = format(x,f'0{n}b')
+        state = np.dot(parse_state(f'|{psi}>'), m)
+        entropy = vn_entropy_from_state(state, n, reverse, k, debug = False) 
+        if entropy > max_entropy: 
+            max_entropy = entropy
+            input = f'|{psi}>'
+    print(f"max vn entropy (input {input}):")
+    vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = True) 
 
-#vn_entropy_from_state((parse_state('|00>')+1j*parse_state('|11>'))*(1/math.sqrt(2)),2)
-#vn_entropy_from_circuit('circuits/I4.out')
-interpret(sys.argv[1], sys.argv[2], len(sys.argv) >= 4 and sys.argv[3] == '-r')
-#print(parse_braket(input()))
+def vn_entropy_test():
+    print("vn entropy test:")
+    print("____________________________________________________")
+    print("QFT 4 qubits")
+    vn_entropy_from_circuit('circuits/QFT4.out', repeat = True)
+    print("____________________________________________________")
+    print("QFT 8 qubits")
+    vn_entropy_from_circuit('circuits/QFT8.out', repeat = True)
+    print("____________________________________________________")
+    print("QFT 2 qubits")
+    vn_entropy_from_circuit('circuits/QFT2.out', repeat = True)
+    print("____________________________________________________")
+    print("Absolutely Maximal Entropy 4 qubits")
+    vn_entropy_from_circuit('circuits/AME4.out', repeat = True)
+    print("____________________________________________________")
+    print("Identity 4 qubits")
+    vn_entropy_from_circuit('circuits/I4.out', repeat = True)
+    print("____________________________________________________")
+
+if '-i' in sys.argv:
+    interpret(sys.argv[1], sys.argv[2], reverse = '-r' in sys.argv, debug = '-d' in sys.argv)
+if '-b' in sys.argv:
+    vn_entropy_test()
