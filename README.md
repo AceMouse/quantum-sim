@@ -2,10 +2,10 @@
 Simulating quantum-circuits in different ways
 
 # compile & run
-use flag `-i` for interpreting a circuit
-use flag `-r` for reverse aplication of the circuit
-use flag `-d` for debug info
-use flag `-b` for a von neumann entropy test
+use flag `-i` for interpreting a circuit  
+use flag `-r` for reverse aplication of the circuit  
+use flag `-d` for debug info  
+use flag `-b` for a von neumann entropy test  
 ```
 ❯ cat circuits/QFT2
 --H-R2--
