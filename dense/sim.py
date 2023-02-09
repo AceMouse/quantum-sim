@@ -8,49 +8,44 @@ _1     = [np.array([[0],[1]], dtype=complex), np.array([0,1], dtype=complex)]
 _plus  = [(_0[i] + _1[i])/math.sqrt(2) for i in range(len(_0))]
 _minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 
-I = np.array([[1,0],[0,1]], dtype=complex)
-X = np.array([[0,1],[1,0]], dtype=complex)
-H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
-def R(angle):
+_I = np.array([[1,0],[0,1]], dtype=complex)
+_X = np.array([[0,1],[1,0]], dtype=complex)
+_H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
+def _R(angle):
     return np.array([[1,0],[0,cmath.exp(1j*angle)]], dtype=complex)
 
-def R_n(n):
-    return R(2*math.pi/math.pow(2,n))
+def _R_n(n):
+    return _R(2*math.pi/math.pow(2,n))
 
+def I(k):
+    I_n = np.array([1],dtype=complex)
+    for i in range(k):
+        I_n = np.kron(I_n,_I)
+    return I_n
 #return a matrix that applies gate U to the t'th qubit in an n qubit state.
-def U(U, t, n): 
+def U(_U, t, n): 
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
-    before = np.array([1],dtype=complex)
-    for i in range(t-1):
-        before = np.kron(before,I)
-    after = np.array([1],dtype=complex)
-    for i in range(n-t):
-        after = np.kron(after,I)
-    return np.kron(before,np.kron(U,after))
+    before = I(t-1) 
+    after = I(n-t)    
+    return np.kron(before,np.kron(_U,after))
     
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
 #return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
-def C(U, c, t, n): 
+def C(_U, c, t, n): 
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
     _min = min(c,t)
     _max = max(c,t)
-    before = np.array([1],dtype=complex)
-    for i in range(_min-1):
-        before = np.kron(before,I)
-    uninvolved = np.array([1],dtype=complex)
-    for i in range(_max-_min-1):
-        uninvolved = np.kron(uninvolved,I)
-    after = np.array([1],dtype=complex)
-    for i in range(n-_max):
-        after = np.kron(after,I)
+    before = I(_min-1)    
+    uninvolved = I(_max-_min-1)
+    after = I(n-_max)
     if c < t:
-        a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(I,after))))
-        b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(U,after))))
+        a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(_I,after))))
+        b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(_U,after))))
     elif t < c:
-        a = np.kron(before,np.kron(I,np.kron(uninvolved,np.kron(proj0,after))))
-        b = np.kron(before,np.kron(U,np.kron(uninvolved,np.kron(proj1,after))))
+        a = np.kron(before,np.kron(_I,np.kron(uninvolved,np.kron(proj0,after))))
+        b = np.kron(before,np.kron(_U,np.kron(uninvolved,np.kron(proj1,after))))
     else:
         raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
     return a+b
@@ -113,13 +108,13 @@ def combine(path):
         g = None
         if instrs[i] == 'C':
             if instrs[i+1] == 'H':
-                g = H
+                g = _H
             elif instrs[i+1] == 'X':
-                g = X
+                g = _X
             elif instrs[i+1] == 'I':
-                g = I
+                g = _I
             elif instrs[i+1][0] == 'R':
-                g = R_n(int(instrs[i+1][1:]))
+                g = _R_n(int(instrs[i+1][1:]))
             c = int(instrs[i+2])
             t = int(instrs[i+3])
             op = C(g,c,t,n) 
@@ -128,13 +123,13 @@ def combine(path):
             continue
         
         if instrs[i] == 'H':
-            g = H
+            g = _H
         elif instrs[i] == 'X':
-            g = X
+            g = _X
         elif instrs[i] == 'I':
-            g = I
+            g = _I
         elif instrs[i][0] == 'R':
-            g = R_n(int(instrs[i][1:]))
+            g = _R_n(int(instrs[i][1:]))
         t = int(instrs[i+1])
         op = U(g,t,n)
         m = np.dot(m, op)
@@ -160,38 +155,39 @@ def interpret(path, state_string, reverse = False, debug=False):
         print("Von Neumann entropy:")
         print(entropy)
 
+def partial_trace(n, psi, trace_out):
+    id = []
+    last = 0
+    s,t = trace_out
+    k = n - (t-s+1)
+    before = I(s-1)
+    after = I(n-t) 
+    rho_a = None 
+    for i in range(1<<k):
+        #print(before, i, after)
+        j = format(i,f"0{k}b")
+        j = np.kron(before, np.kron(parse_state(f'|{j}>'), after))
+        left = np.matmul(j, psi.conj().T)
+        right = np.matmul(psi, j.conj().T)
+        total = np.dot(left, right)
+        if rho_a is None:
+            rho_a = total
+        else:
+            rho_a += total
+    return rho_a
+        
+
 def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
-    psi_ket = state
-    psi_bra = psi_ket.conj().T
     if k == -1:
         k = n>>1
-    before = np.array([1],dtype=complex)
-    for i in range(n-k):
-        before = np.kron(before,I)
-
-    # sum_j_k+1.. =0 -> 1 (<I^k|<j_k+1|...<j_n|)|psi><psi|(|I^k>|j_k+1>...|j_n>)
-    roh_a = None 
-    for x in range(1<<k):
-        j = format(x,f'0{k}b')
-        jket = np.kron(before, parse_state(f'|{j}>'))
-        jbra = jket.conj().T
-        #print(jbra)
-        #print(psi_ket)
-        #print(psi_bra)
-        #print(jket)
-        left = np.matmul(jbra.conj().T, psi_ket.conj().T)
-        right = np.matmul(psi_bra.conj().T, jket.conj().T)
-        total = np.dot(left, right)
-        #print(f'<{j}|00><00|{j}> = \n{total}')
-        if roh_a is None:
-            roh_a = total
-        else:
-            roh_a += total
+    # a = (0,k)
+    b = (k+1, n)
+    rho_a = partial_trace(n, state, b)
     if debug:
         print("rho_a: ")
-        print(np.round(roh_a,4))
+        print(np.round(rho_a,4))
     # -sum_k(lambda_k ln lambda_k)
-    eigen_values, eigen_vectors = np.linalg.eig(roh_a)
+    eigen_values, eigen_vectors = np.linalg.eig(rho_a)
     if debug:
         print("eigen values (sorted): ")
         print(np.round(sorted(eigen_values, reverse =True), 4))
