@@ -243,7 +243,7 @@ def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False):
             max_entropy = entropy
             input = f'|{psi}>'
     print(f"max vn entropy (input {input}):")
-    vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = True) 
+    print(vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = False) )
 
 def trace_test():
     print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (0,0)))
@@ -254,20 +254,32 @@ def trace_test():
 def vn_entropy_test():
     print("vn entropy test:")
     print("____________________________________________________")
+    print("QFT 2 qubits")
+    vn_entropy_from_circuit('circuits/QFT2.out', repeat = True)
+    print("____________________________________________________")
     print("QFT 4 qubits")
     vn_entropy_from_circuit('circuits/QFT4.out', repeat = True)
     print("____________________________________________________")
     print("QFT 8 qubits")
     vn_entropy_from_circuit('circuits/QFT8.out', repeat = True)
     print("____________________________________________________")
-    print("QFT 2 qubits")
-    vn_entropy_from_circuit('circuits/QFT2.out', repeat = True)
+    print("Absolutely Maximal Entropy 2 qubits")
+    vn_entropy_from_circuit('circuits/AME2.out', repeat = True)
     print("____________________________________________________")
     print("Absolutely Maximal Entropy 4 qubits")
     vn_entropy_from_circuit('circuits/AME4.out', repeat = True)
     print("____________________________________________________")
+    print("Absolutely Maximal Entropy 6 qubits")
+    vn_entropy_from_circuit('circuits/AME6.out', repeat = True)
+    print("____________________________________________________")
+    print("Identity 2 qubits")
+    vn_entropy_from_circuit('circuits/I2.out', repeat = True)
+    print("____________________________________________________")
     print("Identity 4 qubits")
     vn_entropy_from_circuit('circuits/I4.out', repeat = True)
+    print("____________________________________________________")
+    print("Identity 8 qubits")
+    vn_entropy_from_circuit('circuits/I8.out', repeat = True)
     print("____________________________________________________")
 
 if '-i' in sys.argv:
