@@ -155,21 +155,46 @@ def interpret(path, state_string, reverse = False, debug=False):
         print("Von Neumann entropy:")
         print(entropy)
 
-def partial_trace(n, psi, trace_out):
+#translated to python from https://github.com/jonasmaziero/LibForQ/blob/master/partial_trace.f90
+def partial_trace_a(rho, da, db):
+    rho_b = np.zeros((db, db), dtype=complex)
+
+    for j in range(db):
+        for k in range(db):
+            for l in range(da):
+                rho_b[j, k] += rho[l * db + j, l * db + k]
+
+    return rho_b
+
+#translated to python from https://github.com/jonasmaziero/LibForQ/blob/master/partial_trace.f90
+def partial_trace_b(rho, da, db):
+    rho_a = np.zeros((da, da), dtype=complex)
+
+    for j in range(da):
+        for k in range(da):
+            for l in range(db):
+                rho_a[j, k] += rho[j * db + l, k * db + l]
+
+    return rho_a
+
+def partial_trace(n, rho, trace_out, debug=False):
     id = []
     last = 0
     s,t = trace_out
     k = n - (t-s+1)
-    before = I(s-1)
-    after = I(n-t) 
-    rho_a = None 
+    before = I(s)
+    after = I(n-t-1) 
+    rho_a = None
+    if debug:
+        print(1<<k)
+        print(n, '\n', s, n-t)
+
     for i in range(1<<k):
-        #print(before, i, after)
         j = format(i,f"0{k}b")
         j = np.kron(before, np.kron(parse_state(f'|{j}>'), after))
-        left = np.matmul(j, psi.conj().T)
-        right = np.matmul(psi, j.conj().T)
-        total = np.dot(left, right)
+        if debug:
+            print(i, '\n', j, '\n', rho)
+        total = np.matmul(np.matmul(j, rho), j.conj().T)
         if rho_a is None:
             rho_a = total
         else:
@@ -180,9 +205,10 @@ def partial_trace(n, psi, trace_out):
 def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
     if k == -1:
         k = n>>1
-    # a = (0,k)
-    b = (k+1, n)
-    rho_a = partial_trace(n, state, b)
+    rho = np.outer(state, np.conj(state))
+    if debug:
+        print(rho)
+    rho_a = partial_trace_b(rho, n, n)
     if debug:
         print("rho_a: ")
         print(np.round(rho_a,4))
@@ -219,6 +245,12 @@ def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False):
     print(f"max vn entropy (input {input}):")
     vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = True) 
 
+def trace_test():
+    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (0,0)))
+    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (1,1)))
+    print(partial_trace_a(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2))
+    print(partial_trace_b(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2))
+
 def vn_entropy_test():
     print("vn entropy test:")
     print("____________________________________________________")
@@ -242,3 +274,5 @@ if '-i' in sys.argv:
     interpret(sys.argv[1], sys.argv[2], reverse = '-r' in sys.argv, debug = '-d' in sys.argv)
 if '-b' in sys.argv:
     vn_entropy_test()
+if '-t' in sys.argv:
+    trace_test()
