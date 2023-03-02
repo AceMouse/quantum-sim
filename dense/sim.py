@@ -156,24 +156,36 @@ def interpret(path, state_string, reverse = False, debug=False):
         print(entropy)
 
 #translated to python from https://github.com/jonasmaziero/LibForQ/blob/master/partial_trace.f90
-def partial_trace_a(rho, da, db):
+def partial_trace_a(rho, da, db, debug=False):
+    if debug:
+        print(f"da {da}, db {db}")
+        print(rho)
     rho_b = np.zeros((db, db), dtype=complex)
-
+    if debug:
+        print(f"da {da}, db {db}")
+        print(rho)
     for j in range(db):
         for k in range(db):
             for l in range(da):
                 rho_b[j, k] += rho[l * db + j, l * db + k]
 
+    if debug:
+        print(rho_b)
     return rho_b
 
 #translated to python from https://github.com/jonasmaziero/LibForQ/blob/master/partial_trace.f90
-def partial_trace_b(rho, da, db):
+def partial_trace_b(rho, da, db, debug=False):
     rho_a = np.zeros((da, da), dtype=complex)
 
+    if debug:
+        print(f"da {da}, db {db}")
+        print(rho)
     for j in range(da):
         for k in range(da):
             for l in range(db):
                 rho_a[j, k] += rho[j * db + l, k * db + l]
+    if debug:
+        print(rho_a)
 
     return rho_a
 
@@ -206,9 +218,10 @@ def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
     if k == -1:
         k = n>>1
     rho = np.outer(state, np.conj(state))
-    if debug:
-        print(rho)
-    rho_a = partial_trace_b(rho, n, n)
+    return vn_entropy_from_density_matrix(rho,n, k, reverse = reverse, debug = debug)
+
+def vn_entropy_from_density_matrix(rho,n, k, reverse = False, debug = True):
+    rho_a = partial_trace_b(rho, n, n, debug=debug)
     if debug:
         print("rho_a: ")
         print(np.round(rho_a,4))
@@ -225,8 +238,7 @@ def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
         print(entropy)
     return entropy
 
-
-def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False):
+def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False, debug=False):
     n, m = combine(path)
     if reverse:
         m = m.conj().T
@@ -243,48 +255,53 @@ def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False):
             max_entropy = entropy
             input = f'|{psi}>'
     print(f"max vn entropy (input {input}):")
-    print(vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = False) )
+    print(vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = debug) )
 
-def trace_test():
-    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (0,0)))
-    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (1,1)))
-    print(partial_trace_a(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2))
-    print(partial_trace_b(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2))
+def trace_test(debug = False):
+    print("____________________________________________________")
+    print("old")
+    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (0,0), debug=debug))
+    print(partial_trace(2, np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]]), (1,1), debug=debug))
 
-def vn_entropy_test():
+    print("____________________________________________________")
+    print("new")
+    print(partial_trace_a(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2, debug=debug))
+    print(partial_trace_b(np.array([[0,0,1,0],[1,0,0,0],[0,0,0,0],[0,0,0,0]], dtype=complex), 2,2, debug=debug))
+
+def vn_entropy_test(debug = False):
     print("vn entropy test:")
     print("____________________________________________________")
     print("QFT 2 qubits")
-    vn_entropy_from_circuit('circuits/QFT2.out', repeat = True)
+    vn_entropy_from_circuit('circuits/QFT2.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("QFT 4 qubits")
-    vn_entropy_from_circuit('circuits/QFT4.out', repeat = True)
+    vn_entropy_from_circuit('circuits/QFT4.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("QFT 8 qubits")
-    vn_entropy_from_circuit('circuits/QFT8.out', repeat = True)
+    vn_entropy_from_circuit('circuits/QFT8.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Absolutely Maximal Entropy 2 qubits")
-    vn_entropy_from_circuit('circuits/AME2.out', repeat = True)
+    vn_entropy_from_circuit('circuits/AME2.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Absolutely Maximal Entropy 4 qubits")
-    vn_entropy_from_circuit('circuits/AME4.out', repeat = True)
+    vn_entropy_from_circuit('circuits/AME4.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Absolutely Maximal Entropy 6 qubits")
-    vn_entropy_from_circuit('circuits/AME6.out', repeat = True)
+    vn_entropy_from_circuit('circuits/AME6.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Identity 2 qubits")
-    vn_entropy_from_circuit('circuits/I2.out', repeat = True)
+    vn_entropy_from_circuit('circuits/I2.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Identity 4 qubits")
-    vn_entropy_from_circuit('circuits/I4.out', repeat = True)
+    vn_entropy_from_circuit('circuits/I4.out', repeat = True, debug=debug)
     print("____________________________________________________")
     print("Identity 8 qubits")
-    vn_entropy_from_circuit('circuits/I8.out', repeat = True)
+    vn_entropy_from_circuit('circuits/I8.out', repeat = True, debug=debug)
     print("____________________________________________________")
 
 if '-i' in sys.argv:
     interpret(sys.argv[1], sys.argv[2], reverse = '-r' in sys.argv, debug = '-d' in sys.argv)
 if '-b' in sys.argv:
-    vn_entropy_test()
+    vn_entropy_test(debug = '-d' in sys.argv)
 if '-t' in sys.argv:
-    trace_test()
+    trace_test(debug = '-d' in sys.argv)
