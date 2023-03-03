@@ -218,13 +218,13 @@ def vn_entropy_from_state(state, n, reverse = False, k = -1, debug = True):
     if k == -1:
         k = n>>1
     rho = np.outer(state, np.conj(state))
-    return vn_entropy_from_density_matrix(rho,n, k, reverse = reverse, debug = debug)
-
-def vn_entropy_from_density_matrix(rho,n, k, reverse = False, debug = True):
     rho_a = partial_trace_b(rho, n, n, debug=debug)
     if debug:
         print("rho_a: ")
         print(np.round(rho_a,4))
+    return vn_entropy_from_partial_trace(rho_a, reverse = reverse, debug = debug)
+
+def vn_entropy_from_partial_trace(rho_a, reverse = False, debug = True):
     # -sum_k(lambda_k ln lambda_k)
     eigen_values, eigen_vectors = np.linalg.eig(rho_a)
     if debug:
