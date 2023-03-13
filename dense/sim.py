@@ -104,36 +104,22 @@ def combine(path):
     m = 1
     n = int(instrs[0])
     i = 1
+    d = {'H':_H,'X':_X,'I':_I}
     while i < len(instrs):
         g = None
-        if instrs[i] == 'C':
-            if instrs[i+1] == 'H':
-                g = _H
-            elif instrs[i+1] == 'X':
-                g = _X
-            elif instrs[i+1] == 'I':
-                g = _I
-            elif instrs[i+1][0] == 'R':
-                g = _R_n(int(instrs[i+1][1:]))
-            c = int(instrs[i+2])
-            t = int(instrs[i+3])
-            op = C(g,c,t,n) 
-            m = np.dot(m, op)
-            i+=4
-            continue
-        
-        if instrs[i] == 'H':
-            g = _H
-        elif instrs[i] == 'X':
-            g = _X
-        elif instrs[i] == 'I':
-            g = _I
+        is_cond = instrs[i] == 'C'
+        i+= is_cond
+        if instrs[i] in d:
+            g = d[instrs[i]]
         elif instrs[i][0] == 'R':
             g = _R_n(int(instrs[i][1:]))
-        t = int(instrs[i+1])
-        op = U(g,t,n)
-        m = np.dot(m, op)
-        i += 2
+        i+= 1
+        c = int(instrs[i])
+        i+= is_cond
+        t = int(instrs[i])
+        i+= 1
+        o = C(g,c,t,n) if is_cond else U(g,t,n)
+        m = np.dot(m, o)
     return n, m
 
 def interpret(path, state_string, reverse = False, debug=False):
