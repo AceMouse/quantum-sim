@@ -10,6 +10,12 @@ _minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
+def kron(arr, dtype=complex):
+    res = np.array([1],dtype=dtype)
+    for x in arr:
+        res = np.kron(res, x)
+    return res
+
 def _R(angle):
     return np.array([[1,0],[0,cmath.exp(1j*angle)]], dtype=complex)
 
@@ -17,37 +23,34 @@ def _R_n(n):
     return _R(2*math.pi/math.pow(2,n))
 
 def I(k):
-    I_n = np.array([1],dtype=complex)
-    for i in range(k):
-        I_n = np.kron(I_n,_I)
-    return I_n
-
-#return a matrix that applies gate U to the t'th qubit in an n qubit state. (1 indexed)
+    return kron([_I]*k)
+#return a matrix that applies gate U to the t'th qubit in an n qubit state.
 def U(_U, t, n): 
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
     before = I(t-1) 
-    after = I(n-t-1)    
-    return np.kron(before,np.kron(_U,after))
+    after = I(n-t)    
+    return kron([before,_U,after])
     
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
-#return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state. (1 indexed) 
+#return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
 def C(_U, c, t, n): 
+    if c == t:
+        raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
     _min = min(c,t)
     _max = max(c,t)
     before = I(_min-1)    
     uninvolved = I(_max-_min-1)
-    after = I(n-_max-1)
-    if c < t:
-        a = np.kron(before,np.kron(proj0,np.kron(uninvolved,np.kron(_I,after))))
-        b = np.kron(before,np.kron(proj1,np.kron(uninvolved,np.kron(_U,after))))
-    elif t < c:
-        a = np.kron(before,np.kron(_I,np.kron(uninvolved,np.kron(proj0,after))))
-        b = np.kron(before,np.kron(_U,np.kron(uninvolved,np.kron(proj1,after))))
-    else:
-        raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
+    after = I(n-_max)
+    x = [proj0, _I]
+    y = [proj1, _U]
+    if t < c:
+        x = x[::-1]
+        y = y[::-1]
+    a = kron([before,x[0],uninvolved,x[1],after])
+    b = kron([before,y[0],uninvolved,y[1],after])
     return a+b
 
 print("dense:")
