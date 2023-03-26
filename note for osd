@@ -1,0 +1,59 @@
+A_ik = sum over j U_ij*Vh_jk
+
+
+a_il = sum over j u_ij*vh_jl
+
+u:
+    j       j       j       j 
+i   1.18    0       0       0
+i   0       0       0       0
+i   0       0       0       0
+i   0       -1.18   0       0
+
+    *
+
+vh:
+    l       l       l       l 
+j   0.8     0       0       0.8
+j   0       -0.8    -0.8    0
+j   0       0       0       0
+j   0       0       0       0
+
+    =
+
+    l       l       l       l
+i   1       0       0       1  
+i   0       0       0       0 
+i   0       0       0       0 
+i   0       1       1       0 
+
+
+a_iklm = sum over j u_ikj*vh_jlm
+
+u:
+    j       j       j       j 
+i k 1.18    0       0       0
+  k 0       0       0       0
+i   0       0       0       0
+    0       -1.18   0       0
+
+    *
+
+vh:
+    l               l       
+    m       m 
+j   0.8     0       0       0.8
+j   0       -0.8    -0.8    0
+j   0       0       0       0
+j   0       0       0       0
+
+    =
+
+    l               l       
+    m       m 
+i k 1       0       0       1  
+  k 0       0       0       0 
+i   0       0       0       0 
+    0       1       1       0 
+
+
