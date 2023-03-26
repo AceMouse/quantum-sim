@@ -115,15 +115,16 @@ print(f"ssd*vh = Vh:\n{Vh}\n")
 
 print(f"U*Vh:\n{U@Vh}\n")
 print(f"Transformed:\n{transform(U@Vh)}\n\n\n")
-print(f"U reshaped to (i:2,k:2,j:4):\n{U.reshape(2,2,4)}\n")
-print(f"U indecies swapped to (j:4,i:2,k:2):\n{U.reshape(2,2,4).transpose([2,0,1])}\n")
+print(f"U transposed to (j:4,i:4):\n{U.transpose()}\n")
+print(f"U reshaped to (j:4,i:2,k:2):\n{U.transpose().reshape(4,2,2)}\n")
 print(f"Vh reshaped to (j:4,l:2,m:2):\n{Vh.reshape(4,2,2)}\n")
+
 import quimb as qu
 import quimb.tensor as qtn
 n=2
 psi = qtn.tensor_builder.MPS_computational_state(input()) #all 0's state
 print(f"psi:\n{psi.to_dense()}\n")
-mpo = qtn.tensor_builder.MatrixProductOperator([U.reshape(2,2,4).transpose([2,0,1]),Vh.reshape(4,2,2)])
+mpo = qtn.tensor_builder.MatrixProductOperator([U.transpose().reshape(4,2,2),Vh.reshape(4,2,2)])
 
 print(f"apply mpo:\n{mpo}\n")
 psi = mpo.apply(psi)
