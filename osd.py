@@ -93,39 +93,52 @@ def transform(A):
     B = B.reshape(-1,4)
     return B
     
+def operator_schmidt_decomposition(U, begining = False, end = False):
+    print(f"A(ijkl):\n{U}\n")
+    A=transform(U)
+    print(f"A(ikjl):\n{A}\n")
+    u,s,vh = np.linalg.svd(A)
+    print(f"u:\n{u}\n")
+    print(f"vh:\n{vh}\n")
+    print(f"s:\n{s}\n")
 
+    ss=np.sqrt(s)
+    print(f"ss:\n{ss}\n")
+    ssd=la.diagsvd(ss,*A.shape)
+    print(f"ssd:\n{ssd}\n")
+
+
+    U=u@ssd
+    Vh=ssd@vh
+    print(f"u*ssd  = U :\n{U}\n")
+    print(f"ssd*vh = Vh:\n{Vh}\n")
+
+    print(f"U*Vh:\n{U@Vh}\n")
+    print(f"Transformed:\n{transform(U@Vh)}\n\n\n")
+    print(f"U transposed to (j:4,i:4):\n{U.transpose()}\n")
+    print(f"U reshaped to (j:4,i:2,k:2):\n{U.transpose().reshape(4,2,2)}\n")
+    print(f"Vh reshaped to (j:4,l:2,m:2):\n{Vh.reshape(4,2,2)}\n")
+    if begining:
+        U=U.transpose().reshape(4,2,2)
+    else:
+        U=U.transpose().reshape(1,4,2,2)
+    if end:
+        Vh=Vh.reshape(4,2,2)
+    else:
+        Vh=Vh.reshape(4,1,2,2)
+
+    return [U,Vh]
 A = C(_X,0,1,1)
-print(f"A(ijkl):\n{A}\n")
-A=transform(A)
-print(f"A(ikjl):\n{A}\n")
-u,s,vh = np.linalg.svd(A)
-print(f"u:\n{u}\n")
-print(f"vh:\n{vh}\n")
-print(f"s:\n{s}\n")
 
-ss=np.sqrt(s)
-print(f"ss:\n{ss}\n")
-ssd=la.diagsvd(ss,*A.shape)
-print(f"ssd:\n{ssd}\n")
-
-U=u@ssd
-Vh=ssd@vh
-print(f"u*ssd  = U :\n{U}\n")
-print(f"ssd*vh = Vh:\n{Vh}\n")
-
-print(f"U*Vh:\n{U@Vh}\n")
-print(f"Transformed:\n{transform(U@Vh)}\n\n\n")
-print(f"U transposed to (j:4,i:4):\n{U.transpose()}\n")
-print(f"U reshaped to (j:4,i:2,k:2):\n{U.transpose().reshape(4,2,2)}\n")
-print(f"Vh reshaped to (j:4,l:2,m:2):\n{Vh.reshape(4,2,2)}\n")
 
 import quimb as qu
 import quimb.tensor as qtn
 n=2
 psi = qtn.tensor_builder.MPS_computational_state(input()) #all 0's state
 print(f"psi:\n{psi.to_dense()}\n")
-mpo = qtn.tensor_builder.MatrixProductOperator([U.transpose().reshape(4,2,2),Vh.reshape(4,2,2)])
+mpo = qtn.tensor_builder.MatrixProductOperator(operator_schmidt_decomposition(A))
 
+print(f"mpo:\n{mpo.to_dense()}\n")
 print(f"apply mpo:\n{mpo}\n")
 psi = mpo.apply(psi)
 print(f"psi:\n{psi.to_dense()}\n")

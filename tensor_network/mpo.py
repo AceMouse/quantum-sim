@@ -53,6 +53,20 @@ def C(_U, c, t, n):
     b = kron([before,y[0],uninvolved,y[1],after])
     return a+b
 
+
+import quimb as qu
+import quimb.tensor as qtn
+
+t1 = _I.reshape(1,2,2)
+t2 = _I.reshape(1,1,2,2)
+t3 = _H.reshape(1,2,2)
+print(t1)
+print(t2)
+print(t3)
+mpo = qtn.tensor_builder.MatrixProductOperator([t1,t2,t3])
+print(mpo)
+
+'''
 print("dense:")
 n=3
 psi=np.kron(np.kron(_0[1], _0[1]),_0[1]) #all 0's state
@@ -74,7 +88,7 @@ n=3
 psi = qtn.tensor_builder.MPS_computational_state('0'*n) #all 0's state
 print(f"psi:\n{psi.to_dense()}")
 arrays = [_I, _I, _H]                                   #apply Hadamar on qubit 3
-u=qtn.tensor_builder.MPO_product_operator(arrays)
+u=qtn.tensor_builder.Matrix_Product_Operator(arrays)
 print(f"apply u:\n{u}")
 psi = u.apply(psi)
 print(f"psi:\n{psi.to_dense()}")
@@ -86,4 +100,4 @@ c = qtn.tensor_builder.MPO_product_operator(c)
 print(f"apply c:\n{c}")
 psi = c.apply(psi)
 print(f"psi:\n{psi.to_dense()}")
-
+'''
