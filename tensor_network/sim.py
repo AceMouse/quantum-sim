@@ -16,7 +16,7 @@ _minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
-
+_S = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]], dtype=complex)
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
     for x in arr:
@@ -105,6 +105,17 @@ def U(_U, t, n):
     
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
 #return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
+def U2(_U, t1, t2, n):
+    if ((t1-t2)**2 > 1):
+        raise Exception("non-local multi qubit gates not implemented!")
+    if t1 == t2:
+        raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
+    _min = min(t1,t2)
+    _max = max(t1,t2)
+    before = I(_min-1, begining=True)    
+    after = I(n-_max, end=True)
+    return before+operator_schmidt_decomposition(_U, begining=_min==1,end=_max==n)+after
+
 def C(_U, c, t, n):
     if ((c-t)**2 > 1):
         raise Exception("non-local multi qubit gates not implemented!")
@@ -112,18 +123,13 @@ def C(_U, c, t, n):
         raise Exception(f'Conditional Error: control and target are the same "{c} == {t}"')
     proj0 = _0[1]*_0[0]
     proj1 = _1[1]*_1[0]
-    _min = min(c,t)
-    _max = max(c,t)
-    before = I(_min-1, begining=True)    
-    after = I(n-_max, end=True)
     x = [proj0, _I]
     y = [proj1, _U]
     if t < c:
         x = x[::-1]
         y = y[::-1]
     u = kron([x[0],x[1]]) + kron([y[0],y[1]])
-#    print(_min,_max,n)
-    return before+operator_schmidt_decomposition(u, begining=_min==1,end=_max==n)+after
+    return U2(u,c,t,n) 
 
 def parse_state(state_string):
     return qtn.tensor_builder.MPS_computational_state(state_string)
@@ -149,10 +155,11 @@ def get_MPOs(path):
     MPOs = []
     n = int(instrs[0])
     i = 1
-    d = {'H':_H,'X':_X,'I':_I}
+    d = {'H':_H,'X':_X,'I':_I,'S':_S}
     while i < len(instrs):
         g = None
         is_cond = instrs[i] == 'C'
+        is_2q = instrs[i] == 'S'
         i+= is_cond
         if instrs[i] in d:
             g = d[instrs[i]]
@@ -160,10 +167,10 @@ def get_MPOs(path):
             g = _R_n(int(instrs[i][1:]))
         i+= 1
         c = int(instrs[i])
-        i+= is_cond
+        i+= is_cond + is_2q
         t = int(instrs[i])
         i+= 1
-        o = C(g,c,t,n) if is_cond else U(g,t,n)
+        o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
 #        print(o)
 #        print([x.shape for x in o])
         o = qtn.tensor_builder.MatrixProductOperator(o)

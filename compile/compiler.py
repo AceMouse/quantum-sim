@@ -4,7 +4,7 @@ import os
 def T(l):
     return [list(x) for x in zip(*l)]
 
-def compile(path):
+def compile(path, local_only=False):
     tokens = []
     with open(path, 'r') as circ:
         lines = circ.readlines()
@@ -13,6 +13,7 @@ def compile(path):
     instructions = [f'{len(tokens)}']
     for col in T(tokens):
         c = None
+        s1 = None
         t = None
         U = None
         for qubit, token in enumerate(col):
@@ -21,6 +22,14 @@ def compile(path):
             if token == 'C-':
                 c = qubit
                 continue
+            if token == 'S-':
+                if s1 is None:
+                    s1 = qubit
+                    continue
+                else:
+                    U = 'S'
+                    t=qubit
+                    continue
             m = re.search('R\d',token)
             if not m is None:
                 U = m.group()
@@ -33,14 +42,28 @@ def compile(path):
                 continue
         if U is None: 
             continue
+        swaps = []
+        if local_only and c:
+            while c<(t-1)<t:
+                swaps.append(['S',c+1,c+2])
+                c+=1
+            while c>(t+1)>t:
+                swaps.append(['S',c+1,c])
+                c-=1
+        for s in swaps:
+            instructions += s
         if not c is None:
             instructions.append('C')
         instructions.append(U)
         if not c is None:
             instructions.append(c+1)
+        if not s1 is None:
+            instructions.append(s1+1)
         instructions.append(t+1)
+        for s in swaps[::-1]:
+            instructions += s
 
-    out_path = path + '.out'
+    out_path = f'{path}{"_l"*local_only}.out'
     try:
         os.remove(out_path)
     except OSError:
@@ -51,4 +74,4 @@ def compile(path):
             out.write(f'{instr}\n')
         
 
-compile(sys.argv[1])
+compile(sys.argv[1], local_only='-l' in sys.argv)
