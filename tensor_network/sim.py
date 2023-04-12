@@ -131,8 +131,30 @@ def C(_U, c, t, n):
     u = kron([x[0],x[1]]) + kron([y[0],y[1]])
     return U2(u,c,t,n) 
 
+def parse_braket(dirac):
+    ket = 1
+    if len(dirac) > 2: 
+        x,*y,z = dirac
+        if x+z == '|>':
+            dirac = y
+        elif x+z == '<|':
+            dirac = y
+            ket = 0
+    d = {'1':_1[ket], '0':_0[ket], '+':_plus[ket], '-':_minus[ket]}
+    vec = []
+    for bit in dirac:    
+        if bit in d:
+            vec.append(d[bit])
+        else:
+            raise Exception(f'Parse Error "{bit}"')
+    vec[0] = vec[0].reshape(1,2)
+    vec[-1] = vec[-1].reshape(1,2)
+    if len(vec)>2:
+        vec = [vec[0]]+[v.reshape(1,1,2) for v in vec[1:-1]]+[vec[-1]]
+    return vec
+
 def parse_state(state_string):
-    return qtn.tensor_builder.MPS_computational_state(state_string)
+    return qtn.tensor_1d.MatrixProductState(parse_braket(state_string))
 
 def print_state(state, shorten=True, postfix=''):
     state = state.flatten()
@@ -149,11 +171,11 @@ def measure(state):
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
 
-def get_MPOs(path):
+def get_MPO(path, max_bond=None, cutoff=None):
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
-    MPOs = []
     n = int(instrs[0])
+    MPO = qtn.tensor_builder.MatrixProductOperator(I(n, begining=True, end=True))
     i = 1
     d = {'H':_H,'X':_X,'I':_I,'S':_S}
     while i < len(instrs):
@@ -171,27 +193,73 @@ def get_MPOs(path):
         t = int(instrs[i])
         i+= 1
         o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
-#        print(o)
+#        print([x for x in o])
 #        print([x.shape for x in o])
         o = qtn.tensor_builder.MatrixProductOperator(o)
-        MPOs.append(o)
-    return n, MPOs
+        MPO=MPO.apply(o)
+        if max_bond and cutoff:
+            MPO.compress(max_bond=max_bond, cutoff=cutoff)
+        elif max_bond:
+            MPO.compress(max_bond=max_bond)
+        elif cutoff:
+            MPO.compress(cutoff=cutoff)
+        else:
+            MPO.compress()
+    return n, MPO
+import sys, os
 
-def interpret(path, state_string, reverse = False, debug=False):
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+def interpret(path, state_string='', reverse = False, debug=False, silent=False, max_bond=None, cutoff=None):
+    if silent:
+        blockPrint()
+    if reverse:
+        raise Exception('reverse not implemented yet')
+#    print(parse_braket(state_string))
+    n, MPO = get_MPO(path, max_bond=max_bond, cutoff=cutoff)
+    if state_string == '':
+        enablePrint()
+        return MPO.compress()
     state = parse_state(state_string)
+#    print(state)
     if debug:
         print("before:")
         print_state(state.to_dense())
         print_measurement(state)
-    n, MPOs = get_MPOs(path)
-    if reverse:
-        MPOs = MPOs[::-1]
-    for MPO in MPOs:
-        state = MPO.apply(state)
+    #if reverse:
+    #    MPOs = MPOs[::-1]
+#    i = 0
+    #for MPO in MPOs:
+    state = MPO.apply(state)
+#        print(state.to_dense())
+#        print(MPO.to_dense())
+#        state.show()
+    state.left_compress()
+#        state.show()
+#        print(i)
+#        i=i+1
     if debug:
         print("after:")
         print_state(state.to_dense())
-    print_measurement(state)
-
-if '-i' in sys.argv:
-    interpret(sys.argv[1], sys.argv[2], reverse = '-r' in sys.argv, debug = '-d' in sys.argv)
+    if n<=16:
+        print_measurement(state)
+    enablePrint()
+    return state
+#   print(state)
+#   print(state.to_dense())
+if __name__ == "__main__":
+    r = '-r' in sys.argv
+    d = '-d' in sys.argv
+    i = '-i' in sys.argv
+    s = '-s' in sys.argv
+    if i:
+        interpret(sys.argv[1], sys.argv[2], reverse = r, debug = d, silent = s)
+    elif len(sys.argv) > 1:
+        interpret(sys.argv[1], reverse = r, debug = d, silent = s)
+        

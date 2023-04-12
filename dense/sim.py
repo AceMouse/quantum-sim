@@ -12,6 +12,7 @@ _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
 
+
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
     for x in arr:
@@ -121,15 +122,30 @@ def combine(path):
         m = np.dot(m, o)
     return n, m
 
-def interpret(path, state_string, reverse = False, debug=False):
+import sys, os
+
+# Disable
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+# Restore
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+def interpret(path, state_string='', reverse = False, debug=False, silent=False):
+    if silent:
+        blockPrint()
+    n, m = combine(path)
+    if reverse:
+        m = m.conj().T
+    if state_string == '':
+        enablePrint()
+        return m
     state = parse_state(state_string)
     if debug:
         print("before:")
         print_state(state)
         print_measurement(state)
-    n, m = combine(path)
-    if reverse:
-        m = m.conj().T
     state = np.dot(state, m)
     if debug:
         print("after:")
@@ -139,6 +155,8 @@ def interpret(path, state_string, reverse = False, debug=False):
     if not debug:
         print("Von Neumann entropy:")
         print(entropy)
+    enablePrint()
+    return state
 
 #translated to python from https://github.com/jonasmaziero/LibForQ/blob/master/partial_trace.f90
 def partial_trace_a(rho, da, db, debug=False):
@@ -284,9 +302,18 @@ def vn_entropy_test(debug = False):
     vn_entropy_from_circuit('circuits/I8.out', repeat = True, debug=debug)
     print("____________________________________________________")
 
-if '-i' in sys.argv:
-    interpret(sys.argv[1], sys.argv[2], reverse = '-r' in sys.argv, debug = '-d' in sys.argv)
-if '-b' in sys.argv:
-    vn_entropy_test(debug = '-d' in sys.argv)
-if '-t' in sys.argv:
-    trace_test(debug = '-d' in sys.argv)
+if __name__ == '__main__':
+    r = '-r' in sys.argv
+    d = '-d' in sys.argv
+    i = '-i' in sys.argv
+    b = '-b' in sys.argv
+    t = '-t' in sys.argv
+    s = '-s' in sys.argv
+    if i:
+        interpret(sys.argv[1], state_string=sys.argv[2], reverse = r, debug = d, silent = s)
+    if b:
+        vn_entropy_test(debug = d)
+    if t:
+        trace_test(debug = d)
+    if not b and not t and not i:
+        interpret(sys.argv[1], debug = d, silent=s)
