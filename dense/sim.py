@@ -11,7 +11,7 @@ _minus = [(_0[i] - _1[i])/math.sqrt(2) for i in range(len(_0))]
 _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
-
+_S = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]], dtype=complex)
 
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
@@ -27,14 +27,17 @@ def _R_n(n):
 
 def I(k):
     return kron([_I]*k)
+
 #return a matrix that applies gate U to the t'th qubit in an n qubit state.
 def U(_U, t, n): 
-    proj0 = _0[1]*_0[0]
-    proj1 = _1[1]*_1[0]
     before = I(t-1) 
     after = I(n-t)    
     return kron([before,_U,after])
     
+def U2(_U, c, t, n): 
+    before = I(min(c,t)-1) 
+    after = I(n-max(c,t))    
+    return kron([before,_U,after])
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
 #return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
 def C(_U, c, t, n): 
@@ -104,10 +107,11 @@ def combine(path):
     m = 1
     n = int(instrs[0])
     i = 1
-    d = {'H':_H,'X':_X,'I':_I}
+    d = {'H':_H,'X':_X,'I':_I,'S':_S}
     while i < len(instrs):
         g = None
         is_cond = instrs[i] == 'C'
+        is_2q = instrs[i] == 'S'
         i+= is_cond
         if instrs[i] in d:
             g = d[instrs[i]]
@@ -115,10 +119,10 @@ def combine(path):
             g = _R_n(int(instrs[i][1:]))
         i+= 1
         c = int(instrs[i])
-        i+= is_cond
+        i+= is_cond + is_2q
         t = int(instrs[i])
         i+= 1
-        o = C(g,c,t,n) if is_cond else U(g,t,n)
+        o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
         m = np.dot(m, o)
     return n, m
 
