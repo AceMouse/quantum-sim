@@ -197,14 +197,10 @@ def get_MPO(path, max_bond=None, cutoff=None):
 #        print([x.shape for x in o])
         o = qtn.tensor_builder.MatrixProductOperator(o)
         MPO=MPO.apply(o)
-        if max_bond and cutoff:
-            MPO.compress(max_bond=max_bond, cutoff=cutoff)
-        elif max_bond:
-            MPO.compress(max_bond=max_bond)
-        elif cutoff:
-            MPO.compress(cutoff=cutoff)
-        else:
-            MPO.compress()
+        if max_bond != None or cutoff != None:
+            MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
+            MPO.right_compress(max_bond=max_bond, cutoff=cutoff)
+
     return n, MPO
 import sys, os
 
@@ -225,7 +221,7 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False,
     n, MPO = get_MPO(path, max_bond=max_bond, cutoff=cutoff)
     if state_string == '':
         enablePrint()
-        return MPO.compress()
+        return MPO
     state = parse_state(state_string)
 #    print(state)
     if debug:
