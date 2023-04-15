@@ -60,29 +60,23 @@ def C(_U, c, t, n):
     return a+b
 
 def parse_braket(dirac):
-    ket = 1
+    ket = 0
     if len(dirac) > 2: 
         x,*y,z = dirac
         if x+z == '|>':
             dirac = y
         elif x+z == '<|':
             dirac = y
-            ket = 0
+            ket = 1
     d = {'1':_1[ket], '0':_0[ket], '+':_plus[ket], '-':_minus[ket]}
-    vec = None
+    vec = [[1]]
     for bit in dirac:    
         if bit in d:
             m = d[bit]
         else:
             raise Exception(f'Parse Error "{bit}"')
-
-        if vec is None:
-            vec = m
-        else: 
-            vec = np.kron(vec, m)
-
-    return np.atleast_2d(vec)
-
+        vec = np.kron(vec, m)
+    return vec
 def parse_state(state_string):
     return parse_braket(state_string)
 
@@ -104,8 +98,8 @@ def print_measurement(state, shorten=True):
 def combine(path):
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
-    m = 1
     n = int(instrs[0])
+    m = I(n)
     i = 1
     d = {'H':_H,'X':_X,'I':_I,'S':_S}
     while i < len(instrs):
@@ -123,7 +117,7 @@ def combine(path):
         t = int(instrs[i])
         i+= 1
         o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
-        m = np.dot(m, o)
+        m = m@o
     return n, m
 
 import sys, os
@@ -150,7 +144,7 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False)
         print("before:")
         print_state(state)
         print_measurement(state)
-    state = np.dot(state, m)
+    state = m@state
     if debug:
         print("after:")
         print_state(state)
@@ -256,13 +250,13 @@ def vn_entropy_from_circuit(path, reverse = False, k = -1, repeat = False, debug
     input = ''
     for x in range(z):
         psi = format(x,f'0{n}b')
-        state = np.dot(parse_state(f'|{psi}>'), m)
+        state = m@parse_state(f'|{psi}>')
         entropy = vn_entropy_from_state(state, n, reverse, k, debug = False) 
         if entropy > max_entropy: 
             max_entropy = entropy
             input = f'|{psi}>'
     print(f"max vn entropy (input {input}):")
-    print(vn_entropy_from_state(np.dot(parse_state(input), m), n, reverse, k, debug = debug) )
+    print(vn_entropy_from_state(m@parse_state(input), n, reverse, k, debug = debug) )
 
 def trace_test(debug = False):
     print("____________________________________________________")
