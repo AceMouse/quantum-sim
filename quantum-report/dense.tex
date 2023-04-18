@@ -1,0 +1,1339 @@
+\section{Dense Simulation}
+We want to simulate applying the QFT to some state, for this we need a way to represent the QFT and the state. 
+in this section we will work towards representing the QFT circuit as a matrix and the state as a vector. 
+\subsection{Representing a one qubit state}
+In classical computation a bit can either be 1 or 0, in quantum systems however a qubit has a certain probability of collapsing to either one or zero at a given time.
+To simulate this we use a vector to represent a qubit or a system of qubits, we denote this using Dirac notation. In Dirac notation we have a bra $\bra{}$ and a ket $\ket{}$, generally a bra denotes a row vector and a ket denotes a column vector.
+To extract the probabilities of a qubit or system of qubits collapsing to one state or the other wetake the norm squared of the entries in the vector, the sum of these must be 1 to be a valid state.
+\newcommand{\qo}{\begin{bmatrix}
+        0\\
+        1\\
+    \end{bmatrix}}
+\newcommand{\qz}{\begin{bmatrix}
+        1\\
+        0\\
+    \end{bmatrix}}
+\newcommand{\qp}{\begin{bmatrix}
+        \sqrt{0.5}\\
+        \sqrt{0.5}\\
+    \end{bmatrix}}
+\newcommand{\qm}{\begin{bmatrix}
+        \sqrt{0.5}\\
+        -\sqrt{0.5}\\
+    \end{bmatrix}}
+    
+\newcommand{\qto}{\mathbf{1}}
+\newcommand{\qtz}{\mathbf{0}}
+\newcommand{\qtp}{\textbf{+}}
+\newcommand{\qtm}{\textbf{--}}
+\begin{figure}[H]
+    \centering
+    \begin{equation*}
+        \ket{\qto} =\qo    
+    \end{equation*}
+    \caption{A qubit with a probability of 1 of collapsing 
+    to one}
+    \label{fig:q1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{equation*}
+        \ket{\qtz} =\qz
+    \end{equation*}
+    \caption{A qubit with a probability of 1 of collapsing to zero}
+    \label{fig:q0}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+    \ket{\qtp} &= \sqrt{0.5}(\ket{\qtz} + \ket{\qto}) = \qp\\
+    \ket{\qtm} &= \sqrt{0.5}(\ket{\qtz} - \ket{\qto}) = \qm
+    \end{align*}
+    \caption{Qubits with a probability of 0.5 of collapsing to zero and one}
+    \label{fig:q+}
+\end{figure}
+\noindent
+In general a qubit
+$
+\begin{bmatrix}
+    \alpha\\
+    \beta\\
+\end{bmatrix}
+= \alpha \ket{\qtz} + \beta \ket{\qto}
+$
+has a probability of $|\alpha|^2$ of collapsing to zero and $|\beta|^2$ of collapsing to one.
+Since we use a vector of complex numbers $|x|^2=xx^*$ denotes the norm squared, where if $x=a+bi$ then $x^*$ is the complex conjugate of $x$, $x^* =a-bi$.
+For readabilitys sake we will not write $+bi$ after a number if $b=0$, you can assume all numbers in vectors and matricies are complex.
+
+\vspace{\baselineskip}
+\noindent
+If we look at these vectors in a coordinate system, where the z axis is the imaginary axis, they all lie on a unit circle.
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \draw[] (0,0) circle (3);
+        
+        \draw[->, thin] (0,-4) -- (0,4) node[draw=none,fill=none,font=\scriptsize,left]{y};
+        \draw[->, thin] (-4,0) -- (4,0) node[draw=none,fill=none,font=\scriptsize,below]{x};
+        
+        \draw[thin](0.6, 3) -- (-0.6, 3) node[draw=none,fill=none,font=\scriptsize,left]{1};
+        \draw[thin](3,0.6) -- (3,-0.6) node[draw=none,fill=none,font=\scriptsize,below]{1};
+        
+        \draw[->, thick] (0,0) -- (0,3) node[draw=none,fill=none,font=\scriptsize,midway,left]{$\ket{\qto}$};
+        \draw[->, thick] (0,0) -- (3,0) node[draw=none,fill=none,font=\scriptsize,midway,above]{$\ket{\qtz}$};
+        \draw[->, thick] (0,0) -- (2.1,2.1) node[draw=none,fill=none,font=\scriptsize,midway,left]{$\ket{\qtp}$};
+        \draw[->, thick] (0,0) -- (2.1,-2.1) node[draw=none,fill=none,font=\scriptsize,midway,above]{$\ket{\qtm}$};
+    \end{tikzpicture}
+    \caption{'Bloch circle' with vectors $\ket{\qto}$, $\ket{\qtp}$, $\ket{\qtz}$ and $\ket{\qtm}$ plotted}
+    \label{fig:block_cirkle}
+\end{figure}
+
+\noindent
+In reality we often use complex numbers with a non-zero imaginary part in the vectors, which results in the qubit states instead lying on the unit sphere, this is known as the Bloch sphere. The z axis is called the phase and generally has no impact on the probabilities of collapsing to a certain state, however it can be used to hold extra information before the qubit is collapsed, this can be useful in computations.
+
+\subsection{Multiple qubit states}
+$\ket{\qto\qtp\qtm}$ denotes a system collapsing to either $\ket{\qto\qtz\qtz}$, $\ket{\qto\qtz\qto}$, $\ket{\qto\qto\qtz}$ or $\ket{\qto\qto\qto}$ with probability 0.25. 
+If we want to compute the state vector for the whole system we take the Kronecker product, sometimes called the tensor product, of the vectors representing the individual qubits in the system. 
+The Kronecker product of two matrix like objects consists of duplicating the second object for every entry in the first object and then scaling every value in the duplicate by the entry in the first object.
+\begin{figure}[H]
+    \centering
+    \begin{gather*}
+        \begin{bmatrix}
+            a_{00} & a_{01} & a_{02} \\
+            a_{10} & a_{11} & a_{12} \\
+        \end{bmatrix}
+        \otimes
+        \begin{bmatrix}
+            b_{00} & b_{01} \\
+            b_{10} & b_{11} \\
+            b_{20} & b_{21} \\
+        \end{bmatrix}
+        = \\
+        \begin{bmatrix}
+            a_{00}
+            \begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} 
+            & a_{01}
+            \begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} 
+            & a_{02}
+            \begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} \\
+            a_{10}
+            \begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} 
+            & a_{11}\begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} 
+            & a_{12}\begin{bmatrix}
+                b_{00} & b_{01} \\
+                b_{10} & b_{11} \\
+                b_{20} & b_{21} \\
+            \end{bmatrix} \\
+        \end{bmatrix}
+        =\\
+        \begin{bmatrix}
+            a_{00}b_{00} & a_{00}b_{01} & a_{01}b_{00} & a_{01}b_{01} & a_{02}b_{00} & a_{02}b_{01}\\
+            a_{00}b_{10} & a_{00}b_{11} & a_{01}b_{10} & a_{01}b_{11} & a_{02}b_{10} & a_{02}b_{11}\\
+            a_{00}b_{20} & a_{00}b_{21} & a_{01}b_{20} & a_{01}b_{21} & a_{02}b_{20} & a_{02}b_{21}\\
+            a_{10}b_{00} & a_{10}b_{01} & a_{11}b_{00} & a_{11}b_{01} & a_{12}b_{00} & a_{12}b_{01}\\
+            a_{10}b_{10} & a_{10}b_{11} & a_{11}b_{10} & a_{11}b_{11} & a_{12}b_{10} & a_{12}b_{11}\\
+            a_{10}b_{20} & a_{10}b_{21} & a_{11}b_{20} & a_{11}b_{21} & a_{12}b_{20} & a_{12}b_{21}\\
+        \end{bmatrix}
+    \end{gather*}    
+    \caption{Example of taking the Kronecker product of two matricies}
+    \label{fig:Kronecker_example}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{gather*}
+        \ket{\qto\qtp\qtm} = \ket{\qto}\otimes\ket{\qtp}\otimes\ket{\qtm} = \\
+        \qo\otimes\qp\otimes\qm = \\
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                \sqrt{0.5}
+                \begin{bmatrix}
+                    \sqrt{0.5}\\
+                    -\sqrt{0.5}\\
+                \end{bmatrix}\\
+                \sqrt{0.5}
+                \begin{bmatrix}
+                    \sqrt{0.5}\\
+                    -\sqrt{0.5}\\
+                \end{bmatrix}\\
+            \end{bmatrix}\\
+            1
+            \begin{bmatrix}
+                \sqrt{0.5}
+                \begin{bmatrix}
+                    \sqrt{0.5}\\
+                    -\sqrt{0.5}\\
+                \end{bmatrix}\\
+                \sqrt{0.5}
+                \begin{bmatrix}
+                    \sqrt{0.5}\\
+                    -\sqrt{0.5}\\
+                \end{bmatrix}\\
+            \end{bmatrix}\\
+        \end{bmatrix}= 
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                0.5\\
+                -0.5\\
+                0.5\\
+                -0.5\\
+            \end{bmatrix}\\
+            1
+            \begin{bmatrix}
+                0.5\\
+                -0.5\\
+                0.5\\
+                -0.5\\
+            \end{bmatrix}\\
+        \end{bmatrix}= 
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            0.5\\
+            -0.5\\
+            0.5\\
+            -0.5\\
+        \end{bmatrix}
+        =\\
+        0\cdot\ket{\mathbf{000}} + 0\cdot\ket{\mathbf{001}}+ 0\cdot\ket{\mathbf{010}}+ 0\cdot\ket{\mathbf{011}}+\\
+        0.5\cdot\ket{\mathbf{100}}- 0.5\cdot\ket{\mathbf{101}}+ 0.5\cdot\ket{\mathbf{110}}- 0.5\cdot\ket{\mathbf{111}}
+    \end{gather*}
+    \caption{Using the Kronecker product to compute the state vector for the system in state $\ket{\qto\qtp\qtm}$}
+    \label{fig:multi_qubit_state_computation}
+\end{figure}
+\noindent
+If we square this vector, equvilent to takeing the norm squared when the imaginary parts are zero,  we get the probability corresponding to each state.
+\begin{figure}[H]
+    \centering
+    \begin{gather*}
+        \ket{\qto\qtp\qtm}^2=
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            0.5\\
+            -0.5\\
+            0.5\\
+            -0.5\\
+        \end{bmatrix}^2
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            0.25\\
+            0.25\\
+            0.25\\
+            0.25\\
+        \end{bmatrix}
+    \end{gather*}
+    \caption{Squaring entries the in state vector to obtain probabilities of the system being in each state, the $i$'th entry in the vector is the probability of the system being in state $\ket{i}$ if you write $i$ in binary using 3 digits}
+    \label{fig:square_state}
+\end{figure}
+
+\subsection{The Quantum Fourier Transform}
+Now we can represent a state as a vector. The $QFT_n$ circuit applies the QFT to a n qubit state and looks like this:
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.57}{
+        \begin{tikzpicture}[square/.style={regular polygon,regular polygon sides=4}]
+            \draw[thin] (16,0) -- (-4,0) 
+             node[draw=none,fill=none,font=\scriptsize,left]{$\ket{\Psi_0}$}
+             node[pos=0.95,fill=white,draw,circle,minimum size=30pt,font=\scriptsize]{$H$} 
+             node[pos=0.88,fill=white,draw,circle,minimum size=30pt,font=\scriptsize](v1_1){$R_2$} 
+             node[pos=0.81,fill=white,draw,circle,minimum size=30pt,font=\scriptsize](v2_1){$R_{3}$} 
+             node[pos=0.67,fill=white,draw,circle,minimum size=30pt,font=\scriptsize](v3_1){$R_{n}$}
+;
+            \draw[thin] (16,-1) -- (-4,-1) 
+             node[draw=none,fill=none,font=\scriptsize,left]{$\ket{\Psi_1}$}
+             node[pos=0.88,fill=black,circle,draw](c1_1){}
+             node[pos=0.6,fill=white,draw,circle,minimum size=30pt,font=\scriptsize]{$H$} 
+             node[pos=0.53,fill=white,draw,circle,minimum size=30pt,font=\scriptsize](v1_2){$R_2$} 
+             node[pos=0.39,fill=white,draw,circle,minimum size=30pt,font=\scriptsize](v2_2){$R_{n-1}$}
+;
+            \draw[thin] (16,-2) -- (-4,-2) 
+             node[draw=none,fill=none,font=\scriptsize,left]{$\ket{\Psi_2}$}
+             node[pos=0.81,fill=black,circle,draw](c2_1){}
+             node[pos=0.53,fill=black,circle,draw](c1_2){};
+
+            \draw[] (-4,-3) circle (0) 
+             node[draw=none,fill=none,font=\scriptsize,left]{$...$};
+
+            \draw[thin] (16,-4) -- (-4,-4)
+             node[draw=none,fill=none,font=\scriptsize,left]{$\ket{\Psi_{n-1}}$}
+             node[pos=0.67,fill=black,circle,draw](c3_1){}
+             node[pos=0.39,fill=black,circle,draw](c2_2){}
+             node[pos=0.115,fill=white,draw,circle,minimum size=30pt,font=\scriptsize]{$H$} 
+             ;
+
+            \draw[thick,white,dashed] (v2_1)+(0.8,-0)--($(v3_1)+(-0.8,-0)$){};
+            \draw[thick,white,dashed] (v2_1)+(0.8,-1)--($(v3_1)+(-0.8,-1)$){};
+            \draw[thick,white,dashed] (v2_1)+(0.8,-2)--($(v3_1)+(-0.8,-2)$){};
+            \draw[thick,white,dashed] (v2_1)+(0.8,-4)--($(v3_1)+(-0.8,-4)$){};
+            \draw[thin](v1_1)--(c1_1);
+            \draw[thin](v2_1)--(c2_1);
+            \draw[thin](v3_1)--(c3_1);
+
+            \draw[thick,white,dashed] (v1_2)+(0.8, 1)--($(v2_2)+(-0.8, 1)$){};
+            \draw[thick,white,dashed] (v1_2)+(0.8, 0)--($(v2_2)+(-0.8, 0)$){};
+            \draw[thick,white,dashed] (v1_2)+(0.8,-1)--($(v2_2)+(-0.8,-1)$){};
+            \draw[thick,white,dashed] (v1_2)+(0.8,-3)--($(v2_2)+(-0.8,-3)$){};
+            \draw[thin](v1_2)--(c1_2);
+            \draw[thin](v2_2)--(c2_2);
+            \draw[thick,white,dashed] (v2_2)+(0.8, 1)--($(v2_2)+(4.8, 1)$){};
+            \draw[thick,white,dashed] (v2_2)+(0.8, 0)--($(v2_2)+(4.8, 0)$){};
+            \draw[thick,white,dashed] (v2_2)+(0.8,-1)--($(v2_2)+(4.8,-1)$){};
+            \draw[thick,white,dashed] (v2_2)+(0.8,-3)--($(v2_2)+(4.8,-3)$){};
+        \end{tikzpicture}
+    }
+    \caption{circuit diagram of $QFT_n$}
+    \label{fig:QTF_n}
+\end{figure}
+\newcommand{\qti}{\mathbf{I}}
+\newcommand{\qtr}[1]{\mathbf{R_{#1}}}
+\newcommand{\qtx}{\mathbf{X}}
+\newcommand{\qth}{\mathbf{H}}
+\newcommand{\qtcx}{\mathbf{CX}}
+In essance this circuit diagram can be read:
+\begin{enumerate}
+    \item apply the $\qth$ gate to the first qubit. 
+    \item apply the $\qtr{2}$ gate to the first qubit controlled by the second qubit. 
+    \item apply the $\qtr{3}$ gate to the first qubit controlled by the third qubit. 
+    \item ... 
+    \item apply the $\qtr{n}$ gate to the first qubit controlled by the last qubit. 
+    \item apply the $\qth$ gate to the second qubit. 
+    \item apply the $\qtr{2}$ gate to the second qubit controlled by the third qubit. 
+    \item ... 
+    \item apply the $\qtr{n-1}$ gate to the second qubit controlled by the last qubit. 
+    \item ... 
+    \item apply the $\qth$ gate to the last qubit. 
+\end{enumerate}
+\subsection{Manipulating qubits}
+\noindent
+In traditional electrical circuits we use logic gates such as NOT, AND, OR, NAND, etc. to manipulate bits. In quantum circuits some common gates are Pauli-X (X, bit flip or NOT), I (identity), H (Hadamard), CNOT (CX or controlled not), etc. In the same way we represent the state of a quantum system as a vector, we can represent a gate that operates on a state as a matrix. 
+\newcommand{\qi}{\begin{bmatrix}
+        1 & 0\\
+        0 & 1\\
+    \end{bmatrix}}
+\newcommand{\qre}[1]{\mathrm{e}^{\frac{2\pi \mathrm{i}}{2^{#1}}}}
+\newcommand{\qr}[1]{\begin{bmatrix}
+        1 & 0\\
+        0 & \qre{#1}\\
+    \end{bmatrix}}
+\newcommand{\qx}{\begin{bmatrix}
+        0 & 1\\
+        1 & 0\\
+    \end{bmatrix}}
+\newcommand{\qh}{\begin{bmatrix}
+        \sqrt{0.5} & \sqrt{0.5}\\
+        \sqrt{0.5} & -\sqrt{0.5}\\
+    \end{bmatrix}}
+\newcommand{\qcx}{\begin{bmatrix}
+        1 & 0 & 0 & 0\\
+        0 & 1 & 0 & 0\\
+        0 & 0 & 0 & 1\\
+        0 & 0 & 1 & 0\\
+    \end{bmatrix}}
+    
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qti &= \qi\\
+        \qtx &= \qx\\
+        \qth &= \qh\\
+        \qtr{n} &= \qr{n}
+    \end{align*}
+    \caption{Matrixes corresponding to $\qti$, $\qtx$, $\qth$ and $\qtr{n}$ gates, which act on a single cubit}
+    \label{fig:single_qubit_gates}
+\end{figure}
+
+\noindent
+If we wish to apply a gate to a qubit in a system we do so by doing matrix multiplication between the state and the gate. 
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qti\ket{\qtz}&=\qi\qz=
+        \begin{bmatrix}
+            1 \cdot 1 + 0 \cdot 0\\
+            0 \cdot 1 + 1 \cdot 0\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}\\
+        \qti\ket{\qto}&=\qi\qo=
+        \begin{bmatrix}
+            1 \cdot 0 + 0 \cdot 1\\
+            0 \cdot 0 + 1 \cdot 1\\
+        \end{bmatrix}=
+        \qo=\ket{\qto}
+    \end{align*}
+    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:i}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtx\ket{\qtz}&=\qx\qz=
+        \begin{bmatrix}
+            0 \cdot 1 + 1 \cdot 0\\
+            1 \cdot 1 + 0 \cdot 0\\
+        \end{bmatrix}=
+        \qo=\ket{\qto}\\
+        \qtx\ket{\qto}&=\qx\qo=
+        \begin{bmatrix}
+            0 \cdot 0 + 1 \cdot 1\\
+            1 \cdot 0 + 0 \cdot 1\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}
+    \end{align*}
+    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:x}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qth\ket{\qtz}&=\qh\qz=
+        \begin{bmatrix}
+            \sqrt{0.5} \cdot 1 + \sqrt{0.5} \cdot 0\\
+            \sqrt{0.5} \cdot 1 - \sqrt{0.5} \cdot 0\\
+        \end{bmatrix}=
+        \qp=\ket{\qtp}\\
+        \qth\ket{\qto}&=\qh\qo=
+        \begin{bmatrix}
+            \sqrt{0.5} \cdot 0 + \sqrt{0.5} \cdot 1\\
+            \sqrt{0.5} \cdot 0 - \sqrt{0.5} \cdot 1\\
+        \end{bmatrix}=
+        \qm=\ket{\qtm}
+    \end{align*}
+    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:h}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtr{2}\ket{\qtz}&=\qr{2}\qz=
+        \begin{bmatrix}
+            1 \cdot 1 + 0 \cdot 0\\
+            0 \cdot 1 + \qre{2} \cdot 0\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}\\
+        \qtr{2}\ket{\qto}&=\qr{2}\qo=
+        \begin{bmatrix}
+            1 \cdot 0 + 0 \cdot 1\\
+            0 \cdot 0 + \qre{2} \cdot 1\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            \qre{2}\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            \mathrm{i}\\
+        \end{bmatrix}
+    \end{align*}
+    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:r2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtcx\ket{\qtz\qtz}&=\qcx
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qtz\qtz}\\
+        \qtcx\ket{\qtz\qto}&=\qcx
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 1 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 0 + 1\cdot 1 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 0 + 0\cdot 1 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 0 + 0\cdot 1 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qtz\qto}\\
+        \qtcx\ket{\qto\qto}&=\qcx
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 0 + 0\cdot 1 + 0\cdot 0\\
+            0\cdot 0 + 1\cdot 0 + 0\cdot 1 + 0\cdot 0\\
+            0\cdot 0 + 0\cdot 0 + 0\cdot 1 + 1\cdot 0\\
+            0\cdot 0 + 0\cdot 0 + 1\cdot 1 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            1\\
+        \end{bmatrix}
+        =\ket{\qto\qto}\\
+        \qtcx\ket{\qto\qto}&=\qcx
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            1\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 1\\
+            0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 1\\
+            0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 1\\
+            0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 1\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qto\qtz}
+    \end{align*}
+    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$}
+    \label{fig:cx}
+\end{figure}
+
+\newpage
+\noindent
+Here we see that applying $\qti$ does not change the state. Applying $\qtx$ takes the state to the same state but reversed. Applying $\qth$ takes the state into a super position of $\ket{\qto}$ and $\ket{\qtz}$. Applying $\qtr{n}$ changes the phase of the cubit but not the chance of it collapsing to something. 
+A key property of quantum gates is that they are reversible, and in fact their own inverses. 
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qti(\qti\ket{\qtz})&=\qti\ket{\qtz}=\ket{\qtz}\\
+        \qti(\qti\ket{\qto})&=\qti\ket{\qto}=\ket{\qto}
+    \end{align*}
+    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \label{fig:i2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtx(\qtx\ket{\qtz})&=\qtx\ket{\qto}=\ket{\qtz}\\
+        \qtx(\qtx\ket{\qto})&=\qtx\ket{\qtz}=\ket{\qto}
+    \end{align*}
+    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \label{fig:x2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{alignat*}{2}
+        \qth(\qth\ket{\qtz})&=\qth\ket{\qtp}&=\ket{\qtz}\\
+        \qth(\qth\ket{\qto})&=\qth\ket{\qtm}&=\ket{\qto}
+    \end{alignat*}
+    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \label{fig:h2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{alignat*}{2}
+        \qtr{2}(\qtr{2}\ket{\qtz})&=\qtr{2}\ket{\qtz}&=\ket{\qtz}\\
+        \qtr{2}(\qtr{2}\ket{\qto})&=\qtr{2}\begin{bmatrix}0\\\mathrm{i}\end{bmatrix}&=\ket{\qto}\\
+    \end{alignat*}
+    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \label{fig:r22}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtcx(\qtcx\ket{\qtz\qtz})&=\qtcx\ket{\qtz\qtz}=\ket{\qtz\qtz} \\        
+        \qtcx(\qtcx\ket{\qtz\qto})&=\qtcx\ket{\qtz\qto}=\ket{\qtz\qto} \\
+        \qtcx(\qtcx\ket{\qto\qtz})&=\qtcx\ket{\qto\qto}=\ket{\qto\qtz}\\
+        \qtcx(\qtcx\ket{\qto\qto})&=\qtcx\ket{\qto\qtz}=\ket{\qto\qto}
+    \end{align*}
+    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$ twice}
+    \label{fig:cx2}
+\end{figure}
+\noindent
+This makes any quantum circuit constructed using these gates reversible.
+
+\subsection{Manipulating qubits individually}
+We have seen how we apply a gate to a system of qubits the same size as the gate. 
+If we want to apply a gate to the $i$'th qubit we construct a gate the same size as the system 
+which acts with identity on every other qubit. We again use the Kronecker product for this. 
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qti\otimes\qti\otimes\qtx\right)\ket{\qtz\qtz\qtz}=\left(\qi\otimes\qi\otimes\qx\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            1
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}\\
+            0 
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qtz\qtz\qto}\\
+    \end{align*}
+    \caption{Applying $\qtx$ to the first qubit in a 3 qubit system}
+    \label{fig:individual_application1}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qti\otimes\qtx\otimes\qti\right)\ket{\qtz\qtz\qtz}=\left(\qi\otimes\qx\otimes\qi\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            1
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}\\
+            0 
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qtz\qto\qtz}\\
+    \end{align*}
+    \caption{Applying $\qtx$ to the second qubit in a 3 qubit system}
+    \label{fig:individual_application2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qtx\otimes\qti\otimes\qti\right)\ket{\qtz\qtz\qtz}=\left(\qx\otimes\qi\otimes\qi\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+           \end{bmatrix}\\
+           1 
+           \begin{bmatrix}
+               1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            1\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qto\qtz\qtz}
+    \end{align*}
+    \caption{Applying $\qtx$ to the thrid qubit in a 3 qubit system}
+    \label{fig:individual_application3}
+\end{figure}
+\newpage
+\noindent
+If we want to apply multiple gates at a time we just replace the corresponding $\qti$ gates. 
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qtx\otimes\qti\otimes\qth\right)\ket{\qtz\qtz\qtz}=\left(\qx\otimes\qi\otimes\qh\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}\\
+            1 
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+        0           &  0          &   0          &   0          &   \sqrt{0.5}      &          \sqrt{0.5} &   0          &   0         \\
+        0           &  0          &   0          &   0          &   \sqrt{0.5}      &         -\sqrt{0.5} &   0          &   0         \\
+        0           &  0          &   0          &   0          &   0               &          0          &   \sqrt{0.5} &   \sqrt{0.5}\\
+        0           &  0          &   0          &   0          &   0               &          0          &   \sqrt{0.5} &  -\sqrt{0.5}\\
+        \sqrt{0.5}  &  \sqrt{0.5} &   0          &   0          &   0               &          0          &   0          &   0         \\
+        \sqrt{0.5}  & -\sqrt{0.5} &   0          &   0          &   0               &          0          &   0          &   0         \\
+        0           &  0          &   \sqrt{0.5} &   \sqrt{0.5} &   0               &          0          &   0          &   0         \\
+        0           &  0          &   \sqrt{0.5} &  -\sqrt{0.5} &   0               &          0          &   0          &   0         \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   \sqrt{0.5}      \cdot 0 +          \sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   \sqrt{0.5}      \cdot 0           -\sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   \sqrt{0.5} \cdot 0 +   \sqrt{0.5}\cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   \sqrt{0.5} \cdot 0    -\sqrt{0.5}\cdot 0\\
+            \sqrt{0.5}  \cdot 1 +  \sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            \sqrt{0.5}  \cdot 1   -\sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   \sqrt{0.5} \cdot 0 +   \sqrt{0.5} \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   \sqrt{0.5} \cdot 0    -\sqrt{0.5} \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            \sqrt{0.5}\\
+            \sqrt{0.5}\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qto\qtz\qtp}
+    \end{align*}
+    \caption{Applying $\qtx$ to the thrid qubit and $\qth$ to the first qubit in a 3 qubit system}
+    \label{fig:applying_multiple_gates}
+\end{figure}
+\noindent
+In general we can construct and apply any number of gates, $U_0,U_1,..,U_n$, to a state $\ket{\Psi}$ in sequence, this is in essence our quantum circuit. 
+And because of the assosiative nature of matrix multiplication we can combine the entire circuit before applying it to different states! 
+This saves tremendously when doing repetitative computations.
+\begin{figure}[H]
+    \centering
+    \begin{gather*}
+        U_0 U_1 .. U_n \ket{\Psi} = \left(\prod_{i=0}^n U_i\right) \ket{\Psi}\\
+    \end{gather*}
+    \caption{Associative nature of matrix multiplication}
+    \label{fig:assosiative}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \mathbf{U}=\qtcx  \left(\qti\otimes\qth\right) \left(\qti\otimes\qtx\right)&=\\
+        \qcx  
+        \begin{bmatrix}
+            1\qh & 0\qh \\
+            0\qh & 1\qh \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\qx & 0\qx \\
+            0\qx & 1\qx \\
+        \end{bmatrix}
+        &=\\
+        \qcx  
+        \begin{bmatrix}
+            \sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            \sqrt{0.5} & -\sqrt{0.5} & 0 & 0 \\
+            0 & 0 & \sqrt{0.5} &  \sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5} & -\sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 \\
+            1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 0 \\
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            \sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            \sqrt{0.5} & -\sqrt{0.5} & 0 & 0 \\
+            0 & 0 & \sqrt{0.5} & -\sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5} &  \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 \\
+            1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 0 \\
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5} & 0 & 0 \\
+            -\sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            0 & 0 & -\sqrt{0.5} & \sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5}  & \sqrt{0.5} \\
+        \end{bmatrix}& 
+    \end{align*}
+    \caption{Computing a matrix representation of a circuit,$\mathbf{U}$, that first applies $\qtx$ then $\qth$ to the first qubit then $\qtcx$ to the first and second qubit}
+    \label{fig:circuit_matrix}
+\end{figure}
+\begin{figure}[H]
+    \begin{alignat*}{2}
+        \mathbf{U}\ket{\qtz\qtz}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 \\
+            0 \\
+            0 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \sqrt{0.5}   \\
+            -\sqrt{0.5}  \\
+            0            \\
+            0            \\
+        \end{bmatrix}&=\ket{\qtz\qtm}\\
+        \mathbf{U}\ket{\qtz\qto}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            1 \\
+            0 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \sqrt{0.5}   \\
+            \sqrt{0.5}   \\
+            0            \\
+            0            \\
+        \end{bmatrix}&=\ket{\qtz\qtp}\\
+        \mathbf{U}\ket{\qto\qtz}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            0 \\
+            1 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0            \\
+            0            \\
+            -\sqrt{0.5}  \\
+            \sqrt{0.5}   \\
+        \end{bmatrix}&=-\ket{\qto\qtm} \\
+        \mathbf{U}\ket{\qto\qto}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            0 \\
+            0 \\
+            1 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0             \\
+            0             \\
+            \sqrt{0.5}    \\
+            \sqrt{0.5}    \\
+        \end{bmatrix}&=\ket{\qto\qtp}
+    \end{alignat*}
+    \caption{Applying the circuit represented by the matrix $\mathbf{U}$ from figure \ref{fig:circuit_matrix} to different states}
+    \label{fig:applying_circuit}
+\end{figure}
+
+
+\subsection{Controlled gates}
+\newcommand{\qtcr}[1]{\mathbf{CR_{#1}}}
+We have described the $\qtr{n}$ gate but for the $QFT$ circuit we need it controlled by another cubit. We can construct a controlled gate out of any other gate we simply take the gate that should happen if the control qubit is $\ket{\qtz}$ and place it in the top left qudrant of a matrix, then place what should happen if it is $\ket{\qto}$ in the bottom right qudrant. 
+This can be expressed like so: 
+\begin{figure}[H]
+    \begin{align*}
+        \mathbf{CU_{1,2}}=\ket{\qtz}\bra{\qtz}\otimes\qti + \ket{\qto}\bra{\qto}\otimes\mathbf{U}&=\\
+        \begin{bmatrix}
+            1 \\
+            0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 & 0 \\
+        \end{bmatrix}
+        \otimes\qti + 
+        \begin{bmatrix}
+            0 \\
+            1 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 \\
+        \end{bmatrix}
+        \otimes\mathbf{U}&=\\
+        \begin{bmatrix}
+            1 & 0 \\
+            0 & 0 \\
+        \end{bmatrix}
+        \otimes\qti + 
+        \begin{bmatrix}
+            0 & 0 \\
+            0 & 1 \\
+        \end{bmatrix}
+        \otimes\mathbf{U}& 
+    \end{align*}
+    \caption{Constructing a controled gate $\mathbf{CU_{1,2}}$ from a gate $\mathbf{U}$ where the first cubit controlls the second}
+    \label{fig:CU1}
+\end{figure}
+\begin{figure}[H]
+    \begin{align*}
+        \mathbf{CU_{2,1}}=\qti\otimes\ket{\qtz}\bra{\qtz} + \mathbf{U}\otimes\ket{\qto}\bra{\qto}&=\\
+        \qti\otimes
+        \begin{bmatrix}
+            1 \\
+            0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 & 0 \\
+        \end{bmatrix}+
+        \mathbf{U}\otimes
+        \begin{bmatrix}
+            0 \\
+            1 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 \\
+        \end{bmatrix}
+        &=\\
+        \qti\otimes
+        \begin{bmatrix}
+            1 & 0 \\
+            0 & 0 \\
+        \end{bmatrix}+ 
+        \mathbf{U}\otimes
+        \begin{bmatrix}
+            0 & 0 \\
+            0 & 1 \\
+        \end{bmatrix}& 
+    \end{align*}
+    \caption{Constructing a controled gate $\mathbf{CU_{2,1}}$ from a gate $\mathbf{U}$ where the second cubit controlls the first}
+    \label{fig:CU1}
+\end{figure}
+
+In our case the controlling qubit is always after the $\qtr{n}$ gate so we only need the second formula. 
+It is important to note that the controlled gate, $\mathbf{U}$ in the examples, can be of any size, therefor it is not an issue that some of the controlled gates have 'empty' wires between them for example here is the result for a $\mathbf{CR_{3_{3,1}}}$ gate. 
+\begin{figure}[H]
+    \begin{align*}
+        \mathbf{CR_{3_{3,1}}}=\qti\otimes\qti\otimes\ket{\qtz}\bra{\qtz} + \qtr{3}\otimes\qti\otimes\ket{\qto}\bra{\qto}&=\\
+        \qti\otimes\qti\otimes
+        \begin{bmatrix}
+            1 \\
+            0 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 & 0 \\
+        \end{bmatrix}+
+        \qtr{3}\otimes\qti\otimes
+        \begin{bmatrix}
+            0 \\
+            1 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 \\
+        \end{bmatrix}
+        &=\\
+        \qti\otimes\qti\otimes
+        \begin{bmatrix}
+            1 & 0 \\
+            0 & 0 \\
+        \end{bmatrix}+ 
+        \qtr{3}\otimes\qti\otimes
+        \begin{bmatrix}
+            0 & 0 \\
+            0 & 1 \\
+        \end{bmatrix}& 
+    \end{align*}
+    \caption{Constructing a controled gate $\mathbf{CR_{3_{3,1}}}$ from a gate $\qtr{3}$ where the second cubit controlls the first}
+    \label{fig:CR3}
+\end{figure}
+
+\subsection{Putting it all together}
+With these tools we can now create a formula for constructing a n qubit state and a n qubit QFT circuit. 
+\begin{figure}[H]
+    \begin{align*}
+        \ket{\Psi} = \ket{\Psi_1\Psi_2..\Psi_n} = \bigotimes_{i=1}^n \ket{\Psi_i}
+    \end{align*}
+    \caption{Constructing the state vector for the n qubit state $\ket{\Psi}$}
+    \label{fig:CPsi}
+\end{figure}
+\begin{figure}[H]
+    \begin{align*}
+        I(k) &= 
+            \begin{cases*}
+                \bigotimes_{i=k}^1\qti
+                & if $k\geq 1$ \\
+            \begin{bmatrix}1\end{bmatrix}        & otherwise
+            \end{cases*}\\
+        STEP(i,n) &= 
+            \begin{cases*}
+            \prod_{j=i}^2  
+                \left(
+                %before
+                I(i)
+                \otimes
+                %step
+                \left(
+                \qti\otimes I(j-2)\otimes\ket{\qtz}\bra{\qtz}
+                + 
+                \qtr{j}\otimes I(j-2)\otimes\ket{\qto}\bra{\qto}
+                \right)
+                %after
+                \otimes
+                I(n-i-j)
+                \right)& if $i\geq2$ \\
+            \begin{bmatrix}1\end{bmatrix}        & otherwise
+            \end{cases*}\\
+        QFT(n) &= 
+        %for each qubit i = (n-1)..0
+        \prod_{i=n-1}^0
+            \left(
+            %for each step j = i..2
+            STEP(n-i,n)
+            \left(
+            %before
+            I(i)\otimes
+            %hadamard
+            \qth\otimes
+            %after 
+            I(n-i-1)
+            \right)
+            \right)
+    \end{align*}
+    \caption{Constructing the matrix for the n qubit QFT}
+    \label{fig:CQFT}
+\end{figure}
+\noindent
+This can be turned into pseudo code: 
+
+
+\hrule width \textwidth
+\begin{pseudo}[kw]*
+    \hd{state}(psi) \\
+$r = \begin{bmatrix}1\end{bmatrix}$  \\
+    for each digit $d$ in $psi$ do:\\+
+        if $d=1$ \\+
+            $r = r \otimes \qo$ \\-
+        else if $d=0$\\+
+            $r = r \otimes \qz$ \\--
+    return $r$ \\  
+\end{pseudo}
+\hrule width \textwidth
+\vspace{\baselineskip}
+\hrule width \textwidth
+\begin{pseudo}[kw]*
+    \hd{I}(k) \\
+$r = \begin{bmatrix}1\end{bmatrix}$  \\
+    $id=\qi$ \\
+    while $k\geq 1$ do:\\+
+    $r = r \otimes id$ \\
+    $k = k-1$\\-
+    return $r$ \\  
+\end{pseudo}
+
+\begin{pseudo}[kw]*
+    \hd{step}(i,n)\\
+    $j = i$\\
+    $r = \begin{bmatrix}1\end{bmatrix}$  \\
+    $id=\begin{bmatrix}1&0\\0&1\end{bmatrix}$ \\
+    $p0=\begin{bmatrix}1&0\\0&0\end{bmatrix}$ \\
+    $p1=\begin{bmatrix}0&0\\0&1\end{bmatrix}$ \\
+    while $j\geq 2$ do: \\+
+    $r_j = \qr{j}$  \\
+    $r = r \cdot (\pr{I}(i) \otimes (id \otimes \pr{I}(j-2) \otimes p0 + r_j \otimes \pr{I}(j-2) \otimes p0) \otimes \pr{I}(n-i-j))$ \\
+    $j = j-1$\\-
+    return $r$ \\  
+\end{pseudo}
+
+\begin{pseudo}[kw]*
+    \hd{QTF}(n) \\
+    $r = I(n)$  \\
+    $had=\qh$ \\
+    $i=n-1$\\
+    while $i\geq 0$ do:\\+
+    $r = r \cdot \pr{step}(n-i,n) \cdot (\pr{I}(i)\otimes had \otimes\pr{I}(n-i-1))$ \\
+    $i = i-1$\\-
+    return $r$ \\  
+\end{pseudo}
+\hrule width \textwidth
+\vspace{\baselineskip}
+\noindent
+An example application could be $QFT(4)\cdot STATE(0010)$.
+Now we move on to show how we construct and apply the circuit using tensor networks.
