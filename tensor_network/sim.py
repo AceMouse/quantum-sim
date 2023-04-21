@@ -198,8 +198,8 @@ def get_MPO(path, max_bond=None, cutoff=None):
         o = qtn.tensor_builder.MatrixProductOperator(o)
         MPO=MPO.apply(o)
         if max_bond != None or cutoff != None:
-            MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
             MPO.right_compress(max_bond=max_bond, cutoff=cutoff)
+            MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
 
     return n, MPO
 import sys, os
@@ -236,7 +236,7 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False,
 #        print(state.to_dense())
 #        print(MPO.to_dense())
 #        state.show()
-    state.left_compress()
+#    state.left_compress()
 #        state.show()
 #        print(i)
 #        i=i+1
@@ -254,8 +254,13 @@ if __name__ == "__main__":
     d = '-d' in sys.argv
     i = '-i' in sys.argv
     s = '-s' in sys.argv
-    if i:
+    b = '-b' in sys.argv
+    if i and b:
+        interpret(sys.argv[1], sys.argv[2], reverse = r, debug = d, silent = s, max_bond=int(sys.argv[3]))
+    elif i:
         interpret(sys.argv[1], sys.argv[2], reverse = r, debug = d, silent = s)
+    elif b:
+        interpret(sys.argv[1], reverse = r, debug = d, silent = s, max_bond=int(sys.argv[2]))
     elif len(sys.argv) > 1:
         interpret(sys.argv[1], reverse = r, debug = d, silent = s)
         
