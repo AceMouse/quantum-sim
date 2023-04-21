@@ -3,21 +3,25 @@ import os
 def gen(n, local_only=False):
     instrs = [n]
     n = int(n)
-    for step in range(n):
-        instrs += ['H', step+1]
-        for row in range(2,n-step+1):
+    if local_only:
+        for step in range(1,n+1):
+            instrs += ['H', step]
             swaps = []
-            c=row+step
-            t=step+1
-            if local_only:
-                while (c>(t+1)):
-                    swaps += [['S', c, c-1]]
-                    c-=1
-                for s in swaps:
+            for i,x in enumerate(range(step,n)):
+                s=['S', x+1, x]
+                instrs += ['C',f'R{i+2}',x+1,x]
+                if x < n-1: 
                     instrs += s
-            instrs += ['C',f'R{row}',c, t]
+                    swaps += [s]
             for s in swaps[::-1]:
                 instrs += s
+    else:
+        for step in range(n):
+            instrs += ['H', step+1]
+            for row in range(2,n-step+1):
+                c=row+step
+                t=step+1
+                instrs += ['C',f'R{row}',c, t]
 
     out_path = f'QFT{n}_g{"_l"*local_only}.out'
     try:
