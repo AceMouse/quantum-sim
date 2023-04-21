@@ -84,3 +84,192 @@ But what is this good for? In essence, when we make tensors share indecies it is
 \noindent
 in this example we have two tensors A and B where each have elements of the form $a_{ijk}, b_{lmj}$ resulting in a single tensor C with the elements $$c_{iklm}=\displaystyle\sum_{x=0}^{dim(j)-1} a_{ixk}b_{lmx} $$
 here $dim(j)=3$ and we subtract 1 since the elements are 0 indexed. In \textit{tensor notation} the summation is implicit if there is a shared index in such an equation so we would just write $c_{iklm}=a_{ijk}b_{lmj}$
+
+\noindent
+We can use a tensor network to represent our $QFT$ cirquit and our state. We will use a matrix product state (MPS) to represent our state, and a matrix product operator (MPO) to repressent our circuit, these are just sub categories of tensor networks. 
+
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (0.25,-1) -- (0.25,-4);
+        \foreach \i in {1,...,4}
+        {
+                \draw[](0.5, -\i +0.25) -- (1, -\i +0.25); 
+        }
+        \draw[fill=red] (0,-0.5) rectangle (0.5,-4) node[pos=0.5]{};
+    \end{tikzpicture}
+    \caption{4 qubit state repressented as a tensor. (MPS)}
+    \label{fig:psi4t}
+\end{figure}
+\noindent
+Here we have the whole state in one large tensor. This is highly undesirable as this uses a lot of memory, we would rather construct a network of tensors. Let us take the state $\ket{0010}$ as an example.
+%TODO: explain SVD and why we use swap gates. 
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (0.25,-1) -- (0.25,-4);
+        \foreach \i in {1,...,4}
+        {
+                \draw[](0.5, -\i +0.25) -- (1, -\i +0.25); 
+                \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
+        }
+        \draw[fill=green] (0,-3) rectangle (0.5,-3+0.5) node[pos=0.5]{};
+    \end{tikzpicture}
+    \caption{4 qubit state $\ket{0010}$ repressented as a tensor network (MPS). Red represents $\ket{0}$ and green $\ket{1}$. }
+    \label{fig:psi4t_mps}
+\end{figure}
+\noindent 
+you may remember that $\ket{\Psi}$ is a vector, in other words a rank 1 tensor, but here we are using them as rank 2 and 3 tensors, how can we do so? We can simply add some dimensions like so:
+$\ket{\Psi} \rightarrow
+\begin{bmatrix}
+    \ket{\Psi}
+\end{bmatrix} \rightarrow
+\begin{bmatrix}
+    \begin{bmatrix}
+        \ket{\Psi}
+    \end{bmatrix}
+\end{bmatrix}$
+
+\begin{figure}[H]
+    \centering 
+    \scalebox{0.57}{
+    \begin{tikzpicture}
+        \foreach \j in {0,...,15}{
+            \draw[](\j+0.25,0) -- (\j+0.25, -3);
+        }
+        \foreach \i in {0,...,3}
+        {
+            \draw[](-0.5,-0.25-\i) -- (16, -0.25-\i);
+            \foreach \j in {0,...,15}{
+                \draw[fill=white] (\j,-\i) rectangle (0.5+\j,-0.5-\i) node[pos=0.5]{};
+            }
+        }
+
+        \draw[fill=green] (0,0) rectangle (0.5,-0.5) node[pos=0.5]{};
+        \foreach \i in {0,...,1}
+        {
+            \draw[fill=red] (1+\i+\i,-\i) rectangle (0.5+1+\i+\i,-0.5-1-\i) node[pos=0.5]{};
+            \draw[fill=yellow] (2+\i+\i,-\i) rectangle (0.5+2+\i+\i,-0.5-1-\i) node[pos=0.5]{};
+        }
+        \draw[fill=red] (5,-2) rectangle (0.5+1+4,-0.5-1-2) node[pos=0.5]{};
+        \draw[fill=yellow] (6,-1) rectangle (0.5+2+4,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=yellow] (7,0) rectangle (0.5+2+5,-0.5-1) node[pos=0.5]{};
+
+        \draw[fill=green] (8,-1) rectangle (0.5+8,-0.5-1) node[pos=0.5]{};
+        \draw[fill=red] (9,-1) rectangle (0.5+9,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=yellow] (10,-1) rectangle (0.5+10,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=red] (11,-2) rectangle (0.5+11,-0.5-1-2) node[pos=0.5]{};
+        \draw[fill=yellow] (12,-1) rectangle (0.5+12,-0.5-1-1) node[pos=0.5]{};
+
+        \draw[fill=green] (13,-2) rectangle (0.5+13,-0.5-2) node[pos=0.5]{};
+        \draw[fill=red] (14,-2) rectangle (0.5+14,-0.5-1-2) node[pos=0.5]{};
+
+        \draw[fill=green] (15,-3) rectangle (0.5+15,-0.5-3) node[pos=0.5]{};
+    \end{tikzpicture}
+    }
+    \caption{$QFT_4$ repressented as a tensor network (MPO). White repressents an identity gate, green a Hadamard gate, red a controlled $R_x,x\in \{2,3,4\}$ gate, and yellow a swap gate.}
+    \label{fig:qft4t}
+\end{figure}
+\begin{figure}[H]
+    \centering 
+    \scalebox{0.57}{
+    \begin{tikzpicture}
+        \foreach \j in {0,...,15}{
+            \draw[](\j+0.25,0) -- (\j+0.25, -3);
+        }
+        \foreach \i in {0,...,3}
+        {
+            \draw[](-0.5,-0.25-\i) -- (16, -0.25-\i);
+            \foreach \j in {0,...,15}{
+                \draw[fill=white] (\j,-\i) rectangle (0.5+\j,-0.5-\i) node[pos=0.5]{};
+            }
+        }
+
+        \draw[fill=green] (0,0) rectangle (0.5,-0.5) node[pos=0.5]{};
+        \foreach \i in {0,...,1}
+        {
+            \draw[fill=red] (1+\i+\i,-\i) rectangle (0.5+1+\i+\i,-0.5-\i) node[pos=0.5]{};
+            \draw[fill=red] (1+\i+\i,-\i-1) rectangle (0.5+1+\i+\i,-0.5-1-\i) node[pos=0.5]{};
+            \draw[fill=yellow] (2+\i+\i,-\i) rectangle (0.5+2+\i+\i,-0.5-\i) node[pos=0.5]{};
+            \draw[fill=yellow] (2+\i+\i,-\i-1) rectangle (0.5+2+\i+\i,-0.5-1-\i) node[pos=0.5]{};
+        }
+        \draw[fill=red] (5,-2) rectangle (0.5+1+4,-0.5-2) node[pos=0.5]{};
+        \draw[fill=red] (5,-3) rectangle (0.5+1+4,-0.5-1-2) node[pos=0.5]{};
+        \draw[fill=yellow] (6,-1) rectangle (0.5+2+4,-0.5-1) node[pos=0.5]{};
+        \draw[fill=yellow] (6,-2) rectangle (0.5+2+4,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=yellow] (7,0) rectangle (0.5+2+5,-0.5) node[pos=0.5]{};
+        \draw[fill=yellow] (7,-1) rectangle (0.5+2+5,-0.5-1) node[pos=0.5]{};
+
+        \draw[fill=green] (8,-1) rectangle (0.5+8,-0.5-1) node[pos=0.5]{};
+        \draw[fill=red] (9,-1) rectangle (0.5+9,-0.5-1) node[pos=0.5]{};
+        \draw[fill=red] (9,-2) rectangle (0.5+9,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=yellow] (10,-1) rectangle (0.5+10,-0.5-1) node[pos=0.5]{};
+        \draw[fill=yellow] (10,-2) rectangle (0.5+10,-0.5-1-1) node[pos=0.5]{};
+        \draw[fill=red] (11,-2) rectangle (0.5+11,-0.5-2) node[pos=0.5]{};
+        \draw[fill=red] (11,-3) rectangle (0.5+11,-0.5-1-2) node[pos=0.5]{};
+        \draw[fill=yellow] (12,-1) rectangle (0.5+12,-0.5-1) node[pos=0.5]{};
+        \draw[fill=yellow] (12,-2) rectangle (0.5+12,-0.5-1-1) node[pos=0.5]{};
+
+        \draw[fill=green] (13,-2) rectangle (0.5+13,-0.5-2) node[pos=0.5]{};
+        \draw[fill=red] (14,-2) rectangle (0.5+14,-0.5-2) node[pos=0.5]{};
+        \draw[fill=red] (14,-3) rectangle (0.5+14,-0.5-1-2) node[pos=0.5]{};
+
+        \draw[fill=green] (15,-3) rectangle (0.5+15,-0.5-3) node[pos=0.5]{};
+    \end{tikzpicture}
+    }
+    \caption{$QFT_4$ from figure \ref{fig:qft4t} with all two qubit gates split using SVD.}
+    \label{fig:qft4t_svd}
+\end{figure}
+
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (0.25,-1) -- (0.25,-4);
+        \foreach \i in {1,...,4}
+        {
+                \draw[](-0.5, -\i +0.25) -- (1, -\i +0.25); 
+                \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
+        }
+    \end{tikzpicture}
+    \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horisontal' shared indecies contracted.}
+    \label{fig:mpo}
+\end{figure}
+\noindent
+Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS by connecting the outputs from the MPS to the inputs to the MPO and contracting those shared indexes. This results in an updated MPS. If we wish to combine two MPOs into one we do the same, just connecting the output of one to the input of another and contracting. 
+
+\begin{figure}[H]
+    \centering 
+    \begin{subfigure}{.3\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \draw[] (0.25,-1) -- (0.25,-4);
+            \draw[] (-0.75,-1) -- (-0.75,-4);
+            \foreach \i in {1,...,4}
+            {
+                    \draw[](-0.5, -\i +0.25) -- (1, -\i +0.25); 
+                    \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
+                    \draw[fill=red] (-1,-\i) rectangle (-0.5,-\i+0.5) node[pos=0.5]{};
+            }
+        \end{tikzpicture}
+        \caption{Before contraction.}
+    \end{subfigure}%
+    \begin{subfigure}{.2\textwidth}
+      \centering
+        $\iff$
+        \vspace{5em}
+    \end{subfigure}
+    \begin{subfigure}{.3\textwidth}
+        \hspace{2em}
+        \begin{tikzpicture}
+            \draw[] (0.25,-1) -- (0.25,-4);
+            \foreach \i in {1,...,4}
+            {
+                    \draw[](0.5, -\i +0.25) -- (1, -\i +0.25); 
+                    \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
+            }
+        \end{tikzpicture}
+        \caption{After contraction.}
+    \end{subfigure}%
+    \caption{MPO applied to MPS.}
+    \label{fig:mpo_mps}
+\end{figure}
