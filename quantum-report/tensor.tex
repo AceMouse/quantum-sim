@@ -273,3 +273,41 @@ Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS b
     \caption{MPO applied to MPS.}
     \label{fig:mpo_mps}
 \end{figure}
+
+Now you might ask why we suddenly are using a ton of swap gates, and what are they even. Swap gates simply swap the values of two qubits, so if $\ket{10}$ goes in $\ket{01}$ commes out. This is simulated with this matrix, when swapping adjacent qubits as we are. 
+\begin{figure}[H]
+    \centering
+    $$
+    \begin{bmatrix}
+        1 & 0 & 0 & 0\\ 
+        0 & 0 & 1 & 0\\ 
+        0 & 1 & 0 & 0\\ 
+        0 & 0 & 0 & 1\\ 
+    \end{bmatrix}
+    $$
+    \caption{SWAP gate matrix. }
+    \label{fig:swap}
+\end{figure}
+
+\noindent
+We do this to avoid having non-local gates in the circuit, such as the controlled $R_x$ gates we use in the QFT. This was not a concern when doing the dense simulation, but here we have to split everything up into tensors acting on individual qubits and therefor would like smaller gates to start with. The reason we have to split everything up is mostly a limitation of the liberary we are using for the simulation, it is a perfectly vallid tensor network even without splitting every gate. It does add a cost of slightly less than two swap gates per non-local gate. 
+This low overhead is not something that can be achieved in general, the most general way to make every gate local requres swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swapgates equal to the number of qubits between the two target qubits times two. We are fortunatly in a situation where we can do this in a smarter way. 
+
+After splitting a gate which acts on more than one qubit the index they share will have a dimension larger than 1, and when we contract a MPO like so: 
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \foreach \j in {0,...,2}
+        {
+            \draw[] (0.25+\j,-1) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                    \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                    \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+    \end{tikzpicture}
+
+    \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horisontal' shared indecies contracted.}
+    \label{fig:mpo_contraction}
+\end{figure}

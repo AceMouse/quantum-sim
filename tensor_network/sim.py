@@ -193,53 +193,38 @@ def get_MPO(path, max_bond=None, cutoff=None):
         t = int(instrs[i])
         i+= 1
         o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
-#        print([x for x in o])
-#        print([x.shape for x in o])
         o = qtn.tensor_builder.MatrixProductOperator(o)
         MPO=MPO.apply(o)
-        if max_bond != None or cutoff != None:
+        if (max_bond != None or cutoff != None) and i%5==0:
             MPO.right_compress(max_bond=max_bond, cutoff=cutoff)
             MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
 
+    MPO.right_compress(max_bond=max_bond, cutoff=cutoff)
+    MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
     return n, MPO
 import sys, os
 
-# Disable
-def blockPrint():
+def disablePrint():
     sys.stdout = open(os.devnull, 'w')
 
-# Restore
 def enablePrint():
     sys.stdout = sys.__stdout__
 
 def interpret(path, state_string='', reverse = False, debug=False, silent=False, max_bond=None, cutoff=None):
     if silent:
-        blockPrint()
+        disablePrint()
     if reverse:
         raise Exception('reverse not implemented yet')
-#    print(parse_braket(state_string))
     n, MPO = get_MPO(path, max_bond=max_bond, cutoff=cutoff)
     if state_string == '':
         enablePrint()
         return MPO
     state = parse_state(state_string)
-#    print(state)
     if debug:
         print("before:")
         print_state(state.to_dense())
         print_measurement(state)
-    #if reverse:
-    #    MPOs = MPOs[::-1]
-#    i = 0
-    #for MPO in MPOs:
     state = MPO.apply(state)
-#        print(state.to_dense())
-#        print(MPO.to_dense())
-#        state.show()
-#    state.left_compress()
-#        state.show()
-#        print(i)
-#        i=i+1
     if debug:
         print("after:")
         print_state(state.to_dense())
@@ -247,8 +232,7 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False,
         print_measurement(state)
     enablePrint()
     return state
-#   print(state)
-#   print(state.to_dense())
+
 if __name__ == "__main__":
     r = '-r' in sys.argv
     d = '-d' in sys.argv
