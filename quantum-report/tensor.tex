@@ -293,21 +293,186 @@ Now you might ask why we suddenly are using a ton of swap gates, and what are th
 We do this to avoid having non-local gates in the circuit, such as the controlled $R_x$ gates we use in the QFT. This was not a concern when doing the dense simulation, but here we have to split everything up into tensors acting on individual qubits and therefor would like smaller gates to start with. The reason we have to split everything up is mostly a limitation of the liberary we are using for the simulation, it is a perfectly vallid tensor network even without splitting every gate. It does add a cost of slightly less than two swap gates per non-local gate. 
 This low overhead is not something that can be achieved in general, the most general way to make every gate local requres swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swapgates equal to the number of qubits between the two target qubits times two. We are fortunatly in a situation where we can do this in a smarter way. 
 
-After splitting a gate which acts on more than one qubit the index they share will have a dimension larger than 1, and when we contract a MPO like so: 
+After splitting a gate which acts on more than one qubit the index they share will have a dimension larger than 1, and when we contract a MPO like so, we can see that the dimension scales quite quickly, with the layers if we do not do something: 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
         \foreach \j in {0,...,2}
         {
+            \foreach \i in {1,...,2}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25) node[font=\scriptsize,below,pos=0.9]{};
+ 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+            \foreach \i in {1,...,1}
+            {
+                \draw[] (0.25+\j,-\i) -- (0.25+\j,-\i-0.5) node[font=\scriptsize,midway,left]{$d_{\j}$};
+            }
+        }
+        \foreach \j in {4,...,5}
+        {
+        }
+        \foreach \i in {1,...,2}
+        {
+            \draw[](-0.5+6, -\i +0.25) -- (1+6, -\i +0.25); 
+            \draw[fill=red] (0+6,-\i) rectangle (0.5+6,-\i+0.5) node[pos=0.5]{};
+        }
+        \foreach \i in {1,...,2}
+        {
+            \draw[](-0.5+4, -\i +0.25) -- (1+5, -\i +0.25); 
+            \draw[fill=red] (0+4,-\i) rectangle (0.5+5,-\i+0.5) node[pos=0.5]{};
+        }
+        \draw[] (0.25+4.5,-1) -- (0.25+4.5,-1-0.5) node[font=\scriptsize,midway,left]{$d_{0}\cdot d_{1}$};
+        \draw[] (0.25+6,-1) -- (0.25+6,-1-0.5) node[font=\scriptsize,midway,left]{$d_{2}$};
+    \end{tikzpicture}
+
+    \caption{MPO with vertical bond dimensions $d_{ij}$}
+    \label{fig:mpo_contraction}
+\end{figure}
+so what can we do? we can compress the bonds in our MPO ever so often, to get them back to a managable size, this is possible since we know our QFT has a fixed max bond dimension. the way we do it is to go though our bonds, e.g from top to bottom and contract then re-split them using svd. This will help, but we can do better if we are willing to pay a little accuracy, we can truncate the singular values to only the ones that contribute the most, and cut out those that do not contribute a lot to the result. In the QFT circuit it has been shown that the singular values decrese exponentially so we don't lose much precission.   
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.3}{
+    \begin{tikzpicture}
+        \foreach \j in {0,...,1}
+        {
             \draw[] (0.25+\j,-1) -- (0.25+\j,-4);
             \foreach \i in {1,...,4}
             {
-                    \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
-                    \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
             }
         }
+        \foreach \j in {3,...,4}
+        {
+            \draw[] (0.25+\j,-1) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[fill=red] (0+3,-1) rectangle (0.5+4,-1+0.5) node[pos=0.5]{};
+        \foreach \j in {6,...,7}
+        {
+            \draw[] (0.25+\j,-1) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[fill=red] (0+6,-1) rectangle (0.5+7,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+6,-2) rectangle (0.5+7,-2+0.5) node[pos=0.5]{};
+        \foreach \j in {9,...,10}
+        {
+            \draw[] (0.25+\j,-1) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[fill=red] (0+9,-0.5) rectangle (0.5+10,-2) node[pos=0.5]{};
+        \foreach \j in {12,...,13}
+        {
+            \draw[] (0.25+\j,-2) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+12,-1) -- (0.75+12,-2);
+        \draw[fill=red] (0+12,-1) rectangle (0.5+13,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+12,-2) rectangle (0.5+13,-2+0.5) node[pos=0.5]{};
+        \foreach \j in {15,...,16}
+        {
+            \draw[] (0.25+\j,-2) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+15,-1) -- (0.75+15,-2);
+        \draw[fill=red] (0+15,-1) rectangle (0.5+16,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+15,-2) rectangle (0.5+16,-2+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+15,-3) rectangle (0.5+16,-3+0.5) node[pos=0.5]{};
+        \foreach \j in {18,...,19}
+        {
+            \draw[] (0.25+\j,-2) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+18,-1) -- (0.75+18,-2);
+        \draw[fill=red] (0+18,-1) rectangle (0.5+19,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+18,-2+0.5) rectangle (0.5+19,-3) node[pos=0.5]{};
+        \foreach \j in {21,...,22}
+        {
+            \draw[] (0.25+\j,-3) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+21,-1) -- (0.75+21,-3);
+        \draw[fill=red] (0+21,-1) rectangle (0.5+22,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+21,-2) rectangle (0.5+22,-2+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+21,-3) rectangle (0.5+22,-3+0.5) node[pos=0.5]{};
+        \foreach \j in {24,...,25}
+        {
+            \draw[] (0.25+\j,-3) -- (0.25+\j,-4);
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+24,-1) -- (0.75+24,-3);
+        \draw[fill=red] (0+24,-1) rectangle (0.5+25,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+24,-2) rectangle (0.5+25,-2+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+24,-3) rectangle (0.5+25,-3+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+24,-4) rectangle (0.5+25,-4+0.5) node[pos=0.5]{};
+        \foreach \j in {27,...,28}
+        {
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+27,-1) -- (0.75+27,-4);
+        \draw[fill=red] (0+27,-1) rectangle (0.5+28,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+27,-2) rectangle (0.5+28,-2+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+27,-2.5) rectangle (0.5+28,-4) node[pos=0.5]{};
+        \foreach \j in {30,...,31}
+        {
+            \foreach \i in {1,...,4}
+            {
+                \draw[](-0.5+\j, -\i +0.25) -- (1+\j, -\i +0.25); 
+                \draw[fill=red] (0+\j,-\i) rectangle (0.5+\j,-\i+0.5) node[pos=0.5]{};
+            }
+        }
+        \draw[] (0.75+30,-1) -- (0.75+30,-4);
+        \draw[fill=red] (0+30,-1) rectangle (0.5+31,-1+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+30,-2) rectangle (0.5+31,-2+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+30,-3) rectangle (0.5+31,-3+0.5) node[pos=0.5]{};
+        \draw[fill=red] (0+30,-4) rectangle (0.5+31,-4+0.5) node[pos=0.5]{};
     \end{tikzpicture}
-
-    \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horisontal' shared indecies contracted.}
-    \label{fig:mpo_contraction}
+    }
+    \caption{From left to right: Steps in compressing an MPO.}
+    \label{fig:compress}
 \end{figure}
+
+so far we have described how to take the vectors and matrix repressentations of gates and add dimmensions to them to make them fit our MPS and MPO repressentations. 
+we show how to take a matrix for a two qubit gate and split it into two seperate matrixes. 
+we show how to contract a tensor network and how to compress an MPO after some amount of applications of other MPOs. 
+
+
