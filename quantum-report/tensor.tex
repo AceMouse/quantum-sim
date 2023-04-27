@@ -1,6 +1,7 @@
 \section{Tensor Network Simulation}
-tensors are mathematical objects have a lot in common with nd-arrays, some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
-Each index has a dimension, for example a rank 2 tensor that is m by n would have one index $i$ taking one of n values and another index $j$ taking one of m values, typically $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$, we can then describe an element by $a_{ij}$, if we have more indecies they are sometimes written as $a_{ij}^{kl}$.
+Tensors are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
+Each index has a dimension, for example a rank 2 tensor that is $m$ by $n$ would have one index $i$ with dimmension $n$ and another index $j$ with dimension $m$, we can then label an element in the tensor $a_{ij}$ where $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$. If we have more indecies they are sometimes written as $a_{ij}^{kl}$.
+We can use diagrams to draw these tensors, the tensors are repressented by red squares and the indecies are repressented by lines attaching to the square. The shape and colour of the tensors and the position of the lines typically do not matter, what is important is which of them are connected by shared indecies. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -37,7 +38,7 @@ Each index has a dimension, for example a rank 2 tensor that is m by n would hav
 \end{figure}
 
 \noindent
-Often the indecies are not numbered on these drawing. If we have two tensors we can make them share an index if they have the same dimension, so if we have two rank 3 tensors, one where we have the dimensions of the indexes be 2, 3, 5 and another where it is 1, 4, 3. We can see that they both have an index of size 3 so if we wish we can make them share label for this index. Thus they could have the indecies i, j, k and l, m, j, notice the reuse of j. 
+Often the indecies are not labled on these drawings. If we have two tensors we can make them share an index if they each have an index with the same dimension. So if we have two rank 3 tensors, one where the dimensions of the indexes are $2, 3, 5$ and another where the dimensions are $1, 4, 3$, we can see that they both have an index of dimension 3 so if we wish we can make them share label for this index. Thus they could have the indecies $i, j, k$ and $l, m, j$, notice the reuse of $j$. 
 
 \begin{figure}[H]
     \centering 
@@ -63,7 +64,7 @@ Often the indecies are not numbered on these drawing. If we have two tensors we 
 \end{figure}
 
 \noindent
-But what is this good for? In essence, when we make tensors share indecies it is a way to symbolise that we are multiplying them, matrix multiplication style. The acctual computation of the multiplication can be done at a later point we are just marking our intention. This is important as we might want to build an entire network of tensors and then be strategic about which shared indecies we choose to \textit{contract}. Contracting a shared index is synonumus with computing the product of the two tensors. 
+But what is this good for? In essence, when we make tensors share indecies it is a way to symbolise that we are \textit{contracting} them. The acctual computation of the contraction can be done at a later point we are just marking our intention. This is important as we might want to build an entire network of tensors and then be strategic about which shared indecies we choose to contract. Contracting a shared index is synonumus with computing the product of the two tensors. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -82,11 +83,12 @@ But what is this good for? In essence, when we make tensors share indecies it is
     \label{fig:4t}
 \end{figure}
 \noindent
-in this example we have two tensors A and B where each have elements of the form $a_{ijk}, b_{lmj}$ resulting in a single tensor C with the elements $$c_{iklm}=\displaystyle\sum_{x=0}^{dim(j)-1} a_{ixk}b_{lmx} $$
-here $dim(j)=3$ and we subtract 1 since the elements are 0 indexed. In \textit{tensor notation} the summation is implicit if there is a shared index in such an equation so we would just write $c_{iklm}=a_{ijk}b_{lmj}$
+In this example we have two tensors A and B where each have elements of the form $a_{ijk}, b_{lmj}$ resulting in a single tensor C with the elements $$c_{iklm}=\displaystyle\sum_{x=0}^{dim(j)-1} a_{ixk}b_{lmx} $$
+Here $dim(j)=3$ and we subtract 1 since the elements are 0 indexed. In \textit{tensor notation} the summation is implicit if there is a shared index in such an equation so we would just write $c_{iklm}=a_{ijk}b_{lmj}$
 
+\subsection{Repressenting a circuit and state using tensors}
 \noindent
-We can use a tensor network to represent our $QFT$ cirquit and our state. We will use a matrix product state (MPS) to represent our state, and a matrix product operator (MPO) to repressent our circuit, these are just sub categories of tensor networks. 
+We can use a tensor network to represent our $QFT$ circuit and our state. We will use a matrix product state (MPS) to represent our state, and a matrix product operator (MPO) to repressent our circuit, these are just sub categories of tensor networks. 
 
 \begin{figure}[H]
     \centering 
@@ -119,7 +121,7 @@ Here we have the whole state in one large tensor. This is highly undesirable as 
     \label{fig:psi4t_mps}
 \end{figure}
 \noindent 
-you may remember that $\ket{\Psi}$ is a vector, in other words a rank 1 tensor, but here we are using them as rank 2 and 3 tensors, how can we do so? We can simply add some dimensions like so:
+You may remember that $\ket{\Psi}$ is a vector, in other words a rank 1 tensor, but here we are using them as rank 2 and 3 tensors, how can we do so? We can simply add some ranks like so,
 $\ket{\Psi} \rightarrow
 \begin{bmatrix}
     \ket{\Psi}
@@ -128,7 +130,11 @@ $\ket{\Psi} \rightarrow
     \begin{bmatrix}
         \ket{\Psi}
     \end{bmatrix}
-\end{bmatrix}$
+\end{bmatrix}$, this can be done for the gates as well, we just add indecies with dimension 1.  
+The more general rule goes that you can change the rank of the tensor as much as you want as long as the product of the dimensions is the same. By this logic we can always add indecies with dimension 1, but we can also split indecies in two as long as the product of the dimensions of the new indecies equals the old index. This operation is often called reshaping. 
+
+\noindent 
+Now let us look at repressenting the QFT as a MPO:
 
 \begin{figure}[H]
     \centering 
@@ -219,21 +225,135 @@ $\ket{\Psi} \rightarrow
     }
     \caption{$QFT_4$ from figure \ref{fig:qft4t} with all two qubit gates split using SVD.}
     \label{fig:qft4t_svd}
-\end{figure}
-
+\end{figure} 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
         \draw[] (0.25,-1) -- (0.25,-4);
         \foreach \i in {1,...,4}
         {
-                \draw[](-0.5, -\i +0.25) -- (1, -\i +0.25); 
-                \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
+            \draw[](-0.5, -\i +0.25) -- (1, -\i +0.25); 
+            \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
         }
     \end{tikzpicture}
     \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horisontal' shared indecies contracted.}
     \label{fig:mpo}
 \end{figure}
+\noindent 
+We have used the singular value decomposition to split the two qubit gates such that we can apply them to each of our qubits seperately. The SVD is a mathematical operation that disassebles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. To take advatage of this we have our 4x4 gates, they have two indecies that each have a dimension 4 but we reshape to 4 indecies with dimensions 2, an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indecies we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$ and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So our matrix elements are divided like this 
+\begin{figure}[H]
+    $$
+    \begin{bmatrix}
+        a_{0000} & a_{0001} & a_{0010} & a_{0011}\\
+        a_{0100} & a_{0101} & a_{0110} & a_{0111}\\
+        a_{1000} & a_{1001} & a_{1010} & a_{1011}\\
+        a_{1100} & a_{1101} & a_{1110} & a_{1111}\\
+    \end{bmatrix}
+    $$
+    \caption{Matrix element indecies}
+    \label{fig:matrix_indecies}
+\end{figure}
+Unfortunately the SVD splits vertically, i.e in this case we would be splitting the gate between the inputs and outputs, but we are interested in splitting between the two qubits, so $i_1$ and $o_1$ are seperate from $i_2$ and $o_2$. Lukily we can just swap around the elements beforehand. 
+\begin{figure}[H]
+    $$
+    \begin{bmatrix}
+        a_{0000} & a_{0001} & a_{0100} & a_{0101}\\
+        a_{0010} & a_{0011} & a_{0110} & a_{0111}\\
+        a_{1000} & a_{1001} & a_{1100} & a_{1101}\\
+        a_{1010} & a_{1011} & a_{1110} & a_{1111}\\
+    \end{bmatrix}
+    $$
+    \caption{Indecies swapped}
+    \label{fig:matrix_swapped}
+\end{figure}
+
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (-3,0.25) -- (-2.5,0.25) node[midway,above]{$i_2$};
+        \draw[] (-3,0.75) -- (0.5-3,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5-3,0) rectangle (-1.5,1) node[pos=0.5]{A};
+        \draw[] (2-3.5,0.25) -- (2.5-3.5,0.25) node[midway,above]{$o_2$};
+        \draw[] (2-3.5,0.75) -- (2.5-3.5,0.75) node[midway,above]{$o_1$};
+
+        \draw[] (0,0.25) -- (0.5,0.25) node[midway,above]{$i_2$};
+        \draw[] (0,0.75) -- (0.5,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5,0) rectangle (1,1) node[pos=0.5]{U};
+        \draw[] (1,0.5) -- (1.5,0.5);
+        \draw[fill=red] (1.5,0.25) rectangle (2,0.75) node[pos=0.5]{$\Lambda$};
+        \draw[] (2,0.5) -- (2.5,0.5);
+        \draw[fill=red] (2.5,0) rectangle (3,1) node[pos=0.5]{V};
+        \draw[] (3,0.25) -- (3.5,0.25) node[midway,above]{$o_2$};
+        \draw[] (3,0.75) -- (3.5,0.75) node[midway,above]{$o_1$};
+    \end{tikzpicture}
+    \caption{SVD whithout swapping}
+    \label{fig:svd_no_swap}
+\end{figure}
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (-3-3,0.25) -- (-2.5-3,0.25) node[midway,above]{$i_2$};
+        \draw[] (-3-3,0.75) -- (0.5-3-3,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5-3-3,0) rectangle (-1.5-3,1) node[pos=0.5]{A};
+        \draw[] (2-3.5-3,0.25) -- (2.5-3.5-3,0.25) node[midway,above]{$o_2$};
+        \draw[] (2-3.5-3,0.75) -- (2.5-3.5-3,0.75) node[midway,above]{$o_1$};
+
+        \draw[] (-3,0.25) -- (-2.5,0.25) node[midway,above]{$o_1$};
+        \draw[] (-3,0.75) -- (0.5-3,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5-3,0) rectangle (-1.5,1) node[pos=0.5]{A};
+        \draw[] (2-3.5,0.25) -- (2.5-3.5,0.25) node[midway,above]{$o_2$};
+        \draw[] (2-3.5,0.75) -- (2.5-3.5,0.75) node[midway,above]{$i_2$};
+
+        \draw[] (0,0.25) -- (0.5,0.25) node[midway,above]{$o_1$};
+        \draw[] (0,0.75) -- (0.5,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5,0) rectangle (1,1) node[pos=0.5]{U};
+        \draw[] (1,0.5) -- (1.5,0.5);
+        \draw[fill=red] (1.5,0.25) rectangle (2,0.75) node[pos=0.5]{$\Lambda$};
+        \draw[] (2,0.5) -- (2.5,0.5);
+        \draw[fill=red] (2.5,0) rectangle (3,1) node[pos=0.5]{V};
+        \draw[] (3,0.25) -- (3.5,0.25) node[midway,above]{$o_2$};
+        \draw[] (3,0.75) -- (3.5,0.75) node[midway,above]{$i_2$};
+    \end{tikzpicture}
+    \caption{SVD whith swapping}
+    \label{fig:svd_swap}
+\end{figure}
+We do though want to express this using two tensors only, but this is fortunatly easy as we can just split $\Lambda$ by squaring every value in it. Now we can contract two indecies and get the result we want. 
+\begin{figure}[H]
+    \centering 
+    \begin{tikzpicture}
+        \draw[] (0,0.25) -- (0.5,0.25) node[midway,above]{$o_1$};
+        \draw[] (0,0.75) -- (0.5,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (0.5,0) rectangle (1,1) node[pos=0.5]{U};
+        \draw[] (1,0.5) -- (1.5,0.5);
+        \draw[fill=red] (1.5,0.25) rectangle (2+0.5,0.75) node[pos=0.5]{$\sqrt{\Lambda}$};
+        \draw[] (2.5,0.5) -- (2.5+0.5,0.5);
+        \draw[fill=red] (1.5+1.5,0.25) rectangle (2+2,0.75) node[pos=0.5]{$\sqrt{\Lambda}$};
+        \draw[] (2+2,0.5) -- (2.5+2,0.5);
+        \draw[fill=red] (2.5+2,0) rectangle (3+2,1) node[pos=0.5]{V};
+        \draw[] (3+2,0.25) -- (3.5+2,0.25) node[midway,above]{$o_2$};
+        \draw[] (3+2,0.75) -- (3.5+2,0.75) node[midway,above]{$i_2$};
+
+        \draw[] (4+2,0.25) -- (4.5+2,0.25) node[midway,above]{$o_1$};
+        \draw[] (4+2,0.75) -- (4.5+2,0.75) node[midway,above]{$i_1$};
+        \draw[fill=red] (4.5+2,0) rectangle (5.5+2,1) node[pos=0.5]{U$\sqrt{\Lambda}$};
+        \draw[] (1+4+2+0.5,0.5) -- (1.5+4+2+0.5,0.5);
+        \draw[fill=red] (5.5+0.5+2,0) rectangle (6.5+0.5+2,1) node[pos=0.5]{$\sqrt{\Lambda}$V};
+        \draw[] (6.5+0.5+2,0.25) -- (7+2+0.5,0.25) node[midway,above]{$o_2$};
+        \draw[] (6.5+2+0.5,0.75) -- (9.5,0.75) node[midway,above]{$i_2$};
+
+        \draw[] (10,0.5) -- (10.5,0.5) node[midway,above]{$i_2$};
+        \draw[] (10,2) -- (10.5,2) node[midway,above]{$i_1$};
+        \draw[fill=red] (10.5,0) rectangle (11.5,1) node[pos=0.5]{$\sqrt{\Lambda}$V};
+        \draw[] (11,1) -- (11,1.5);
+        \draw[fill=red] (10.5,1.5) rectangle (11.5,2.5) node[pos=0.5]{U$\sqrt{\Lambda}$};
+        \draw[] (11.5,0.5) -- (12,0.5) node[midway,above]{$o_2$};
+        \draw[] (11.5,2) -- (12,2) node[midway,above]{$o_1$};
+
+    \end{tikzpicture}
+    \caption{Combine the network from figure \ref{fig:svd_swap} into two tensors.}
+    \label{fig:svd_combine}
+\end{figure}
+
 \noindent
 Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS by connecting the outputs from the MPS to the inputs to the MPO and contracting those shared indexes. This results in an updated MPS. If we wish to combine two MPOs into one we do the same, just connecting the output of one to the input of another and contracting. 
 
@@ -474,5 +594,5 @@ so what can we do? we can compress the bonds in our MPO ever so often, to get th
 so far we have described how to take the vectors and matrix repressentations of gates and add dimmensions to them to make them fit our MPS and MPO repressentations. 
 we show how to take a matrix for a two qubit gate and split it into two seperate matrixes. 
 we show how to contract a tensor network and how to compress an MPO after some amount of applications of other MPOs. 
-
+we use this to repressent the QFT as a tensor network using only local gates, using swap gates in the construction.
 
