@@ -17,6 +17,7 @@ _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
 _S = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]], dtype=complex)
+
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
     for x in arr:
@@ -41,27 +42,11 @@ def I(k, begining=False, end=False):
     return [_I.reshape(1,2,2) if begining else _I.reshape(1,1,2,2)] + ([_I.reshape(1,1,2,2)]*(k-2)) + [_I.reshape(1,2,2) if end else _I.reshape(1,1,2,2)]
 
 def swapBits(x, p1, p2, n):
-
-    # Move all bits of first
-    # set to rightmost side
     set1 =  (x >> p1) & ((1<< n) - 1)
-  
-    # Move all bits of second
-    # set to rightmost side
     set2 =  (x >> p2) & ((1 << n) - 1)
-  
-    # XOR the two sets
     xor = (set1 ^ set2)
-  
-    # Put the xor bits back
-    # to their original positions
     xor = (xor << p1) | (xor << p2)
-  
-    # XOR the 'xor' with the
-    # original number so that the
-    # two sets are swapped
     result = x ^ xor
-  
     return result
 
 #CNOT after transformation

@@ -130,6 +130,42 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
+# This is the function we are trying to fit to the data.
+def func(x, a, b, c):
+    return [a*x*x + b*x + c for x in x]
+
+
+import matplotlib.pyplot as plt;
+import scipy.optimize as opt;
+def graph_measurement(state):
+    N, _ = state.shape
+    xdata = [i/N for i in range(N)] 
+    ydata = state.real.flatten()
+
+    # Plot the actual data
+    plt.plot(xdata, ydata, ".", label="real data",linestyle="--");
+
+#    # The actual curve fitting happens here
+#    optimizedParameters, pcov = opt.curve_fit(func, xdata, ydata);
+
+#    # Use the optimized parameters to plot the best fit
+#    plt.plot(xdata, func(xdata, *optimizedParameters), label="real fit");
+    
+    xdata = [i/N for i in range(N)] 
+    ydata = state.imag.flatten()
+
+    # Plot the actual data
+    plt.plot(xdata, ydata, ".", label="imag data",linestyle="-");
+
+#    # The actual curve fitting happens here
+#    optimizedParameters, pcov = opt.curve_fit(func, xdata, ydata);
+
+#    # Use the optimized parameters to plot the best fit
+#    plt.plot(xdata, func(xdata, *optimizedParameters), label="imag fit");
+    # Show the graph
+    plt.legend();
+    plt.show();
+
 def interpret(path, state_string='', reverse = False, debug=False, silent=False):
     if silent:
         blockPrint()
@@ -140,6 +176,8 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False)
         enablePrint()
         return m
     state = parse_state(state_string)
+    if not silent:
+        graph_measurement(state)
     if debug:
         print("before:")
         print_state(state)
@@ -149,6 +187,8 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False)
         print("after:")
         print_state(state)
     print_measurement(state)
+    if not silent:
+        graph_measurement(state)
     entropy = vn_entropy_from_state(state, n, reverse = reverse, debug = debug)
     if not debug:
         print("Von Neumann entropy:")
