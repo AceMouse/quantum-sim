@@ -5,7 +5,9 @@ Simulating quantum-circuits in different ways
 use flag `-i` for interpreting a circuit  
 use flag `-r` for reverse aplication of the circuit  
 use flag `-d` for debug info  
-use flag `-b` for a von neumann entropy test  
+use flag `-b` for supplying a max bond   
+use flag `-s` for silent mode   
+        
 ```
 ❯ cat circuits/QFT2
 --H-R2--
