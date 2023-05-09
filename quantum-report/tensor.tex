@@ -2,38 +2,25 @@
 Tensors are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
 Each index has a dimension, for example a rank 2 tensor that is $m$ by $n$ would have one index $i$ with dimmension $n$ and another index $j$ with dimension $m$, we can then label an element in the tensor $a_{ij}$ where $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$. If we have more indecies they are sometimes written as $a_{ij}^{kl}$.
 We can use diagrams to draw these tensors, the tensors are repressented by red squares and the indecies are repressented by lines attaching to the square. The shape and colour of the tensors and the position of the lines typically do not matter, what is important is which of them are connected by shared indecies. 
-\begin{figure}[H]
-    \centering 
-    \begin{tikzpicture}
-        \draw[fill=red] (0,0) rectangle (2,2) node[pos=0.5]{};
-    \end{tikzpicture}
-    \caption{rank 0 tensor.}
-    \label{fig:r0t}
-\end{figure}
 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
-        \draw[fill=red] (0,0) rectangle (2,2) node[pos=0.5]{};
-        \draw[](2, 1) -- (3, 1) 
+        \draw[fill=red] (-8,0) rectangle (-6,2) node[pos=0.5]{};
+
+        \draw[fill=red] (-4,0) rectangle (-2,2) node[pos=0.5]{};
+        \draw[](-2, 1) -- (-1, 1) 
          node[draw=none,fill=none,font=\scriptsize,midway,below]{$i$};
-        \draw (-1, 1) node[draw=none]{};
-    \end{tikzpicture}
-    \caption{rank 1 tensor. Each index is repressented by a line}
-    \label{fig:r1t}
-\end{figure}
+        \draw (-5, 1) node[draw=none]{};
 
-\begin{figure}[H]
-    \centering 
-    \begin{tikzpicture}
-        \draw[fill=red] (0,0) rectangle (2,2) node[pos=0.5]{};
-        \draw[](2, 1) -- (3, 1)  
+        \draw[fill=red] (1,0) rectangle (3,2) node[pos=0.5]{};
+        \draw[](3, 1) -- (4, 1)  
          node[draw=none,fill=none,font=\scriptsize,midway,below]{$j$};
-        \draw[](0, 1) -- (-1, 1)  
+        \draw[](1, 1) -- (0, 1)  
          node[draw=none,fill=none,font=\scriptsize,midway,below]{$i$};
         
     \end{tikzpicture}
-    \caption{rank 2 tensor. Each index is repressented by a line}
+    \caption{rank 0, 1 and 2 tensor. Each index is repressented by a line}
     \label{fig:r2t}
 \end{figure}
 

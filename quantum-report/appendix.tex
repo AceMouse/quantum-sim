@@ -1,0 +1,665 @@
+\section{Appendix}
+\subsection{calculations for section \ref{sec:maniq}} \label{app:maniq}
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qti\ket{\qtz}&=\qi\qz=
+        \begin{bmatrix}
+            1 \cdot 1 + 0 \cdot 0\\
+            0 \cdot 1 + 1 \cdot 0\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}\\
+        \qti\ket{\qto}&=\qi\qo=
+        \begin{bmatrix}
+            1 \cdot 0 + 0 \cdot 1\\
+            0 \cdot 0 + 1 \cdot 1\\
+        \end{bmatrix}=
+        \qo=\ket{\qto}
+    \end{align*}
+    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:app_i}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtx\ket{\qtz}&=\qx\qz=
+        \begin{bmatrix}
+            0 \cdot 1 + 1 \cdot 0\\
+            1 \cdot 1 + 0 \cdot 0\\
+        \end{bmatrix}=
+        \qo=\ket{\qto}\\
+        \qtx\ket{\qto}&=\qx\qo=
+        \begin{bmatrix}
+            0 \cdot 0 + 1 \cdot 1\\
+            1 \cdot 0 + 0 \cdot 1\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}
+    \end{align*}
+    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:app_x}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qth\ket{\qtz}&=\qh\qz=
+        \begin{bmatrix}
+            \sqrt{0.5} \cdot 1 + \sqrt{0.5} \cdot 0\\
+            \sqrt{0.5} \cdot 1 - \sqrt{0.5} \cdot 0\\
+        \end{bmatrix}=
+        \qp=\ket{\qtp}\\
+        \qth\ket{\qto}&=\qh\qo=
+        \begin{bmatrix}
+            \sqrt{0.5} \cdot 0 + \sqrt{0.5} \cdot 1\\
+            \sqrt{0.5} \cdot 0 - \sqrt{0.5} \cdot 1\\
+        \end{bmatrix}=
+        \qm=\ket{\qtm}
+    \end{align*}
+    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:app_h}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtr{2}\ket{\qtz}&=\qr{2}\qz=
+        \begin{bmatrix}
+            1 \cdot 1 + 0 \cdot 0\\
+            0 \cdot 1 + \qre{2} \cdot 0\\
+        \end{bmatrix}=
+        \qz=\ket{\qtz}\\
+        \qtr{2}\ket{\qto}&=\qr{2}\qo=
+        \begin{bmatrix}
+            1 \cdot 0 + 0 \cdot 1\\
+            0 \cdot 0 + \qre{2} \cdot 1\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            \qre{2}\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            \mathrm{i}\\
+        \end{bmatrix}
+    \end{align*}
+    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \label{fig:app_r2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \qtcx\ket{\qtz\qtz}&=\qcx
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qtz\qtz}\\
+        \qtcx\ket{\qtz\qto}&=\qcx
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 1 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 0 + 1\cdot 1 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 0 + 0\cdot 1 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 0 + 0\cdot 1 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qtz\qto}\\
+        \qtcx\ket{\qto\qtz}&=\qcx
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 0 + 0\cdot 1 + 0\cdot 0\\
+            0\cdot 0 + 1\cdot 0 + 0\cdot 1 + 0\cdot 0\\
+            0\cdot 0 + 0\cdot 0 + 0\cdot 1 + 1\cdot 0\\
+            0\cdot 0 + 0\cdot 0 + 1\cdot 1 + 0\cdot 0\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            1\\
+        \end{bmatrix}
+        =\ket{\qto\qto}\\
+        \qtcx\ket{\qto\qto}&=\qcx
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            1\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 1\\
+            0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 1\\
+            0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 1\\
+            0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 1\\
+        \end{bmatrix}=
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+        \end{bmatrix}
+        =\ket{\qto\qtz}
+    \end{align*}
+    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$}
+    \label{fig:app_cx}
+\end{figure}
+
+\subsection{calculations for section \ref{sec:maniqi}}\label{app:maniqi}
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qti\otimes\qti\otimes\qtx\right)\ket{\qtz\qtz\qtz}=\left(\qi\otimes\qi\otimes\qx\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            1
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}\\
+            0 
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qx & 0 \qx\\
+                0 \qx & 1 \qx\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qtz\qtz\qto}\\
+    \end{align*}
+    \caption{Applying $\qtx$ to the first qubit in a 3 qubit system}
+    \label{fig:app_individual_application1}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qti\otimes\qtx\otimes\qti\right)\ket{\qtz\qtz\qtz}=\left(\qi\otimes\qx\otimes\qi\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            1
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}\\
+            0 
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                0 \qi & 1 \qi\\
+                1 \qi & 0 \qi\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qtz\qto\qtz}\\
+    \end{align*}
+    \caption{Applying $\qtx$ to the second qubit in a 3 qubit system}
+    \label{fig:app_individual_application2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qtx\otimes\qti\otimes\qti\right)\ket{\qtz\qtz\qtz}=\left(\qx\otimes\qi\otimes\qi\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+           \end{bmatrix}\\
+           1 
+           \begin{bmatrix}
+               1 \qi & 0 \qi\\
+                0 \qi & 1 \qi\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qi & 0 \qi\\
+                0 \qi & 1 \qi
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0\\
+            1\cdot 1 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+            0\cdot 1 + 0\cdot 0 + 0\cdot 0 + 1\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0 + 0\cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            1\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qto\qtz\qtz}
+    \end{align*}
+    \caption{Applying $\qtx$ to the thrid qubit in a 3 qubit system}
+    \label{fig:app_individual_application3}
+\end{figure}
+\newpage
+\noindent
+If we want to apply multiple gates at a time we just replace the corresponding $\qti$ gates. 
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \left(\qtx\otimes\qti\otimes\qth\right)\ket{\qtz\qtz\qtz}=\left(\qx\otimes\qi\otimes\qh\right)\left(\qz\otimes\qz\otimes\qz\right)&= \\
+        \begin{bmatrix}
+            0
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}
+            & 1
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}\\
+            1 
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}
+            & 0
+            \begin{bmatrix}
+                1 \qh & 0 \qh\\
+                0 \qh & 1 \qh\\
+            \end{bmatrix}\\ 
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+        0           &  0          &   0          &   0          &   \sqrt{0.5}      &          \sqrt{0.5} &   0          &   0         \\
+        0           &  0          &   0          &   0          &   \sqrt{0.5}      &         -\sqrt{0.5} &   0          &   0         \\
+        0           &  0          &   0          &   0          &   0               &          0          &   \sqrt{0.5} &   \sqrt{0.5}\\
+        0           &  0          &   0          &   0          &   0               &          0          &   \sqrt{0.5} &  -\sqrt{0.5}\\
+        \sqrt{0.5}  &  \sqrt{0.5} &   0          &   0          &   0               &          0          &   0          &   0         \\
+        \sqrt{0.5}  & -\sqrt{0.5} &   0          &   0          &   0               &          0          &   0          &   0         \\
+        0           &  0          &   \sqrt{0.5} &   \sqrt{0.5} &   0               &          0          &   0          &   0         \\
+        0           &  0          &   \sqrt{0.5} &  -\sqrt{0.5} &   0               &          0          &   0          &   0         \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0\\
+            0
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   \sqrt{0.5}      \cdot 0 +          \sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   \sqrt{0.5}      \cdot 0           -\sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   \sqrt{0.5} \cdot 0 +   \sqrt{0.5}\cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   \sqrt{0.5} \cdot 0    -\sqrt{0.5}\cdot 0\\
+            \sqrt{0.5}  \cdot 1 +  \sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            \sqrt{0.5}  \cdot 1   -\sqrt{0.5} \cdot 0 +   0          \cdot 0 +   0          \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   \sqrt{0.5} \cdot 0 +   \sqrt{0.5} \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+            0           \cdot 1 +  0          \cdot 0 +   \sqrt{0.5} \cdot 0    -\sqrt{0.5} \cdot 0 +   0               \cdot 0 +          0          \cdot 0 +   0          \cdot 0 +   0         \cdot 0\\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0\\
+            0\\
+            0\\
+            0\\
+            \sqrt{0.5}\\
+            \sqrt{0.5}\\
+            0\\
+            0
+        \end{bmatrix}
+        &=
+        \ket{\qto\qtz\qtp}
+    \end{align*}
+    \caption{Applying $\qtx$ to the thrid qubit and $\qth$ to the first qubit in a 3 qubit system}
+    \label{fig:app_applying_multiple_gates}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{align*}
+        \mathbf{U}=\qtcx  \left(\qti\otimes\qth\right) \left(\qti\otimes\qtx\right)&=\\
+        \qcx  
+        \begin{bmatrix}
+            1\qh & 0\qh \\
+            0\qh & 1\qh \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\qx & 0\qx \\
+            0\qx & 1\qx \\
+        \end{bmatrix}
+        &=\\
+        \qcx  
+        \begin{bmatrix}
+            \sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            \sqrt{0.5} & -\sqrt{0.5} & 0 & 0 \\
+            0 & 0 & \sqrt{0.5} &  \sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5} & -\sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 \\
+            1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 0 \\
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            \sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            \sqrt{0.5} & -\sqrt{0.5} & 0 & 0 \\
+            0 & 0 & \sqrt{0.5} & -\sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5} &  \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 & 1 & 0 & 0 \\
+            1 & 0 & 0 & 0 \\
+            0 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 0 \\
+        \end{bmatrix}
+        &=\\
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5} & 0 & 0 \\
+            -\sqrt{0.5} &  \sqrt{0.5} & 0 & 0 \\
+            0 & 0 & -\sqrt{0.5} & \sqrt{0.5} \\
+            0 & 0 & \sqrt{0.5}  & \sqrt{0.5} \\
+        \end{bmatrix}& 
+    \end{align*}
+    \caption{Computing a matrix representation of a circuit,$\mathbf{U}$, that first applies $\qtx$ then $\qth$ to the first qubit then $\qtcx$ to the first and second qubit}
+    \label{fig:app_circuit_matrix}
+\end{figure}
+\begin{figure}[H]
+    \begin{alignat*}{2}
+        \mathbf{U}\ket{\qtz\qtz}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 \\
+            0 \\
+            0 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \sqrt{0.5}   \\
+            -\sqrt{0.5}  \\
+            0            \\
+            0            \\
+        \end{bmatrix}&=\ket{\qtz\qtm}\\
+        \mathbf{U}\ket{\qtz\qto}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            1 \\
+            0 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \sqrt{0.5}   \\
+            \sqrt{0.5}   \\
+            0            \\
+            0            \\
+        \end{bmatrix}&=\ket{\qtz\qtp}\\
+        \mathbf{U}\ket{\qto\qtz}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            0 \\
+            1 \\
+            0 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0            \\
+            0            \\
+            -\sqrt{0.5}  \\
+            \sqrt{0.5}   \\
+        \end{bmatrix}&=-\ket{\qto\qtm} \\
+        \mathbf{U}\ket{\qto\qto}&=
+        \begin{bmatrix}
+            \sqrt{0.5}  &  \sqrt{0.5}   & 0             & 0          \\
+            -\sqrt{0.5} &  \sqrt{0.5}   & 0             & 0          \\
+            0           & 0             & -\sqrt{0.5}   & \sqrt{0.5} \\
+            0           & 0             & \sqrt{0.5}    & \sqrt{0.5} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+            0 \\
+            0 \\
+            0 \\
+            1 \\
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            0             \\
+            0             \\
+            \sqrt{0.5}    \\
+            \sqrt{0.5}    \\
+        \end{bmatrix}&=\ket{\qto\qtp}
+    \end{alignat*}
+    \caption{Applying the circuit represented by the matrix $\mathbf{U}$ from figure \ref{fig:app_circuit_matrix} to different states}
+    \label{fig:app_applying_circuit}
+\end{figure}
