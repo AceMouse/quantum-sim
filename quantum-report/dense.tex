@@ -1,4 +1,4 @@
-\section{Dense Simulation}
+\section{Dense Simulation}\label{sec:dense}
 We want to simulate applying the QFT to some state, for this we need a way to represent the QFT and the state. 
 in this section we will work towards representing the QFT circuit as a matrix and the state as a vector. 
 \subsection{Representing a one qubit state}
@@ -613,7 +613,7 @@ It is important to note that the controlled gate, $\mathbf{U}$ in the examples, 
     \label{fig:CR3}
 \end{figure}
 
-\subsection{The Quantum Fourier Transform}
+\subsection{The Quantum Fourier Transform}\label{sec:qft}
 Now we can represent a state as a vector and we have the building blocks for representing the QFT as a matrix. The $QFT_n$ circuit applies the QFT to a n qubit state and looks like this:
 
 \begin{figure}[H]
@@ -686,6 +686,41 @@ In essance this circuit diagram can be read:
     \item ... 
     \item apply the $\qth$ gate to the last qubit. 
 \end{enumerate}
+This is all well and good, but how does this circuit end up performing a discrete Fourier transform? The definition of the DFT is given by this formula:
+$$X_{k}=\sum _{n=0}^{N-1}x_{n}\cdot e^{-{\frac {i2\pi }{N}}kn}$$
+where $x$ is the input vector and $X$ is the output vector, the subscribts are used for indexing in the vectors. 
+$$x_{n}={\frac {1}{N}}\sum _{k=0}^{N-1}X_{k}\cdot e^{{\frac {i2\pi }{N}}kn}$$
+This is the inverse DFT.
+The QFT acts on a state $\ket{x}=\ket{x_0,x_1,...,x_{N-1}}$ and transforms it into the state $\ket{y}=\ket{y_0,y_1,...,y_{N-1}}$, the transformation is exactly: 
+$$y_{k}={\frac {1}{\sqrt {N}}}\sum _{n=0}^{N-1}x_{n}e^{{\frac {i2\pi }{N}}kn},\quad k=0,1,2,\ldots ,N-1$$
+we see that it is eqiuvalent to the inverse DFT.
+The QFT applied to a state is also sometimes written as 
+\begin{equation*}
+\resizebox{.9\hsize}{!}{${\text{QFT}}(|x_{1}x_{2}\ldots x_{n}\rangle )={\frac {1}{\sqrt {N}}}\ \left(|0\rangle +e^{2\pi i\,[0.x_{n}]}|1\rangle \right)\otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n-1}x_{n}]}|1\rangle \right)\otimes \cdots \otimes \left(|0\rangle +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}|1\rangle \right)$}
+\end{equation*}
+and if we don't apply the swaps in the end of the QFT we get 
+\begin{equation*}
+\resizebox{.9\hsize}{!}{${\text{QFT}}(|x_{1}x_{2}\ldots x_{n}\rangle )={\frac {1}{\sqrt {N}}}\ \left(|0\rangle +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}|1\rangle \right)\otimes \cdots \otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n-1}x_{n}]}|1\rangle \right)\otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n}]}|1\rangle \right)$}
+\end{equation*}
+But how does the circuit laid out above result in this formula?
+Let us first look at $QFT_1\ket{x_1}$, which is just $\qth\ket{x_1}$ this can be written as $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}\ket{\qto})$.
+We see here that if $x_1$ is 1 we have $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\pi i}\ket{\qto})$ and if it is 0 we have $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{0}\ket{\qto})$ whitch is equivalent to $\frac{1}{\sqrt{2^1}}(\ket{\qtz}-\ket{\qto})=H\ket{\qto}$ and $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+\ket{\qto})=H\ket{\qtz}$. 
+To make the equation match the one from the definition we can say $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i\frac{x_1}{2^1}}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1]}\ket{\qto})$. 
+Here $[b_0.b_1b_2b_3...b_n]=\Sigma^{n}_{i=0}\frac{b_i}{2^i}$, so a binary number.  
+
+
+For the case of $QFT_2\ket{x_1,x_2}$ we have that $x_2$ is transformed in the same way as $x_1$ in $QFT_1$ and $x_1$ is now transformed like so $\qth\ket{x_1}$ if $x_2=0$ and $\qth\qtr{2}\ket{x_1}$ if $x_2=1$. 
+This can be expressed like so 
+$\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}e^{\frac{2\pi i}{2^2}x_2}\ket{\qto})= \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1+\frac{2\pi i}{2^2}x_2}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})$. 
+If we put this together we get $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})\otimes \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_2]}\ket{\qto})=\frac{1}{\sqrt{2^2}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})\otimes(\ket{\qtz}+e^{2\pi i[0.x_2]}\ket{\qto})$. 
+
+For the case of $QFT_3\ket{x_1,x_2,x_3}$ we have that $x_2$ and $x_3$ is transformed in the same way as $x_1$ and $x_2$ in $QFT_2$ and $x_1$ is now transformed like so $\qth\ket{x_1}$ if $x_2=x_3=0$, $\qth\qtr{2}\ket{x_1}$ if $x_2=1,x_3=0$, $\qth\qtr{3}\ket{x_1}$ if $x_2=0,x_3=1$ and $\qth\qtr{2}\qtr{3}\ket{x_1}$ if $x_2=x_3=1$. 
+This can be expressed with 
+$\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}e^{\frac{2\pi i}{2^2}x_2}e^{\frac{2\pi i}{2^3}x_3}\ket{\qto})= \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1+\frac{2\pi i}{2^2}x_2+\frac{2\pi i}{2^3}x_3}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2x_3]}\ket{\qto})$.
+
+This pattern continues in a sort of recurcive definition of $QFT_n$ in terms of $QFT_{n-1}$ and one 'step' affecting the first qubit. 
+
+
 \subsection{Putting it all together}
 With these tools we can now create a formula for constructing a n qubit state and a n qubit QFT circuit. 
 \begin{figure}[H]
