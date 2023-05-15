@@ -98,7 +98,7 @@ In reality we often use complex numbers with a non-zero imaginary part in the ve
 
 \subsection{Multiple qubit states}
 $\ket{\qto\qtp\qtm}$ denotes a system collapsing to either $\ket{\qto\qtz\qtz}$, $\ket{\qto\qtz\qto}$, $\ket{\qto\qto\qtz}$ or $\ket{\qto\qto\qto}$ with probability 0.25. 
-If we want to compute the state vector for the whole system we take the Kronecker product, sometimes called the tensor product, of the vectors representing the individual qubits in the system. 
+If we want to compute the state vector for the whole system we take the Kronecker product\cite{kronecker_product}, sometimes called the tensor product, of the vectors representing the individual qubits in the system. 
 The Kronecker product of two matrix like objects consists of duplicating the second object for every entry in the first object and then scaling every value in the duplicate by the entry in the first object.
 \begin{figure}[H]
     \centering
@@ -575,7 +575,7 @@ This can be expressed like so:
     \caption{Constructing a controled gate $\mathbf{CU_{2,1}}$ from a gate $\mathbf{U}$ where the second cubit controlls the first}
     \label{fig:CU1}
 \end{figure}
-
+\noindent
 In our case the controlling qubit is always after the $\qtr{n}$ gate so we only need the second formula. 
 It is important to note that the controlled gate, $\mathbf{U}$ in the examples, can be of any size, therefor it is not an issue that some of the controlled gates have 'empty' wires between them for example here is the result for a $\mathbf{CR_{3_{3,1}}}$ gate. 
 \begin{figure}[H]
@@ -709,11 +709,19 @@ We see here that if $x_1$ is 1 we have $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\pi i
 To make the equation match the one from the definition we can say $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i\frac{x_1}{2^1}}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1]}\ket{\qto})$. 
 
 
+
+
+\vspace{\baselineskip}
+\noindent
 For the case of $QFT_2\ket{x_1,x_2}$ we have that $x_2$ is transformed in the same way as $x_1$ in $QFT_1$ and $x_1$ is now transformed like so $\qth\ket{x_1}$ if $x_2=0$ and $\qth\qtr{2}\ket{x_1}$ if $x_2=1$. 
 This can be expressed like so 
 $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}e^{\frac{2\pi i}{2^2}x_2}\ket{\qto})= \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1+\frac{2\pi i}{2^2}x_2}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})$. 
 If we put this together we get $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})\otimes \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_2]}\ket{\qto})=\frac{1}{\sqrt{2^2}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2]}\ket{\qto})\otimes(\ket{\qtz}+e^{2\pi i[0.x_2]}\ket{\qto})$. 
 
+
+
+\vspace{\baselineskip}
+\noindent
 For the case of $QFT_3\ket{x_1,x_2,x_3}$ we have that $x_2$ and $x_3$ is transformed in the same way as $x_1$ and $x_2$ in $QFT_2$ and $x_1$ is now transformed like so $\qth\ket{x_1}$ if $x_2=x_3=0$, $\qth\qtr{2}\ket{x_1}$ if $x_2=1,x_3=0$, $\qth\qtr{3}\ket{x_1}$ if $x_2=0,x_3=1$ and $\qth\qtr{2}\qtr{3}\ket{x_1}$ if $x_2=x_3=1$. 
 This can be expressed with 
 $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}e^{\frac{2\pi i}{2^2}x_2}e^{\frac{2\pi i}{2^3}x_3}\ket{\qto})= \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1+\frac{2\pi i}{2^2}x_2+\frac{2\pi i}{2^3}x_3}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2x_3]}\ket{\qto})$.

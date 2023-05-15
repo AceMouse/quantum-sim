@@ -1,4 +1,4 @@
-\section{Results \& conclusion}\label{sec:results}
+\section{Results \& Conclusion}\label{sec:results}
 During this project I implementet both the dense and tensor network simulations and here are some results, unless otherwise mentioned all tensor network simulations are run with max bond at 32. 
 \begin{figure}[H]
     \begin{center}
@@ -8,6 +8,7 @@ During this project I implementet both the dense and tensor network simulations 
     \caption{Time and peak RAM usage from constructing the dense matricies, using the approach discussed in section \ref{sec:dense}.}
     \label{fig:dense_perf}
 \end{figure}
+\noindent
 We see here that both time and memory usage scales faster that quadratic in the number of qubits simulated in the dense simulation. If we look at the tensor network simulation we see a different picture; time scales quadratically and memory has these spikes but seems to not be affected by the number of qubits after a while. We also notice that before we had to stop at 14 qubits now we arbitrarily stop at 32 qubits, but if we want we can run it with 64 qubits in around 30 minutes or larger if we have the time. 
 \begin{figure}[H]
     \begin{center}
@@ -17,6 +18,7 @@ We see here that both time and memory usage scales faster that quadratic in the 
     \caption{Time and peak RAM usage from constructing the MPOs, using the approach discussed in section \ref{sec:tensor}, compressing after every fifth gate applied.}
     \label{fig:stensor_perf}
 \end{figure}
+\noindent
 The spikes stem from only compressing the MPO every five gates, to confirm this we do the same benchmark where we compress every time. 
 \begin{figure}[H]
     \begin{center}
@@ -26,8 +28,11 @@ The spikes stem from only compressing the MPO every five gates, to confirm this 
     \caption{Time and peak RAM usage from constructing the MPOs, using the approach discussed in section \ref{sec:tensor}, compressing after every gate applied.}
     \label{fig:tensor_perf}
 \end{figure}
+\noindent
 Here we can see the spikes disappear, but we trade it for more time elapsed about 2.5x for 32 qubits. For 64 qubits with a max bond at 65 the difference is 30 minutes against 1 hour and 40 minutes, i.e. a 3.3x speedup gained by skipping some compressions. 
 
+\vspace{\baselineskip}
+\noindent
 Now for the precission, the whole project is built upon the resently proven claim that the singular values are exponentially decreasing in the QFT circuit and therefor we can get most of the precission with a low max bond on the network, here we see a plot of the precission for both the compress every time and every fifth time 
 \begin{figure}[H]
     \begin{center}
@@ -37,6 +42,7 @@ Now for the precission, the whole project is built upon the resently proven clai
     \caption{Error obtained by converting the MPO to its dense repressentation and taking the operator norm of the difference with the exact matrix produced by the dense simulation. Left: compress every time, Right: compress every fifth time. }
     \label{fig:tensor_error}
 \end{figure}
+\noindent
 We see here that the error is approximatly the same whether we compress every time or every fifth time. We also notice that it decreasses less and less and at some point completely stops improving as we increase the max bond. This is exactly as we expected to see. This is because at some point around a max bond of 40 we keep any relevant data for this circuit even after the compression. If we look at how the memory and time usage is affected by adjusting the max bond we see that it is a powerfull lever for trading precission for performance. 
 
 \begin{figure}[H]
@@ -55,6 +61,9 @@ We see here that the error is approximatly the same whether we compress every ti
     \caption{Time and peak RAM usage from constructing the MPOs, using the approach discussed in section \ref{sec:tensor}, compressing after every fifth gate applied.}
     \label{fig:stensor_perf_max_bond}
 \end{figure}
+\noindent
 The reason we do not extend the graph for the benchmark where we compress every fifth time beyond 47 as max bond is because the spikes in memory usage scale with the max bond and the gap between compressions as seen in the peak memory graph in figure \ref{fig:stensor_perf_max_bond}. 
 
+\vspace{\baselineskip}
+\noindent
 In conclusion I have implemented enough of the ideas from the paper to see the effects play out and it is indeed far more efficient to simulate the QFT using tensor networs, with close to no error. 

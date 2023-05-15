@@ -13,14 +13,23 @@
 \usepackage{titlesec}
 \usetikzlibrary{shapes.geometric}
 \usetikzlibrary{calc}
-\title{Bachelor Project}
-\author{Asmus Tørsleff }
-\date{April 2023}
+\title{Efficient Classical Simulation of the Quantum Fourier Transform}
+\author{
+\centering
+\begin{tabular}{r|c|l}
+    & Asmus Tørsleff & asmt@itu.dk (asmus.torsleff@gmail.com)\\
+    Supervisor & Michael Kastoryano & micka@itu.dk \\
+    Co-Supervisor & Nutan Limaye & nuli@itu.dk \\
+\end{tabular}}
+\date{\today}
 \TabPositions{1.5cm} % Adjust as needed!
 \setcounter{MaxMatrixCols}{20}
 \begin{document}
 
 \maketitle
+\begin{center}
+    code: BIBAPRO1PE
+\end{center}
 \newpage
 \tableofcontents
 \newpage
@@ -31,11 +40,10 @@
 \input{dense}
 \newpage
 \input{tensor}
-\newpage
 \input{results}
-\newpage
 \input{further}
 \newpage
+\nocite{quimb}
 \bibliographystyle{plain} % We choose the "plain" reference style
 \bibliography{bib}
 \newpage
@@ -43,49 +51,10 @@
 \newpage
 
 \end{document}
-%Michael Notes:
-%
-%
-%
-%
-%
-%
-%
-% What therory is missing?
-% add introduction. 
-%
-%
-%
-%
-%
-%
 % What therory should be better explained?
 % make it clear that the singular values exponentially decresing.
-% make it clear why the circuit achieves the same as the DFT.
-% 
-%
-%
-%
-%
-% What about sources and citations?
-% 'the' paper and ~5 reference papers on quantum computing, svd and so on. 
-%
-%
-%
-%
-%
-%
+
 % Should i make a pressentation for the exam and how long will the exam be?
 % yes, 15 minutes, 10 minutes pressenting what i did, then 5 min live demo in jupyter notebook.
-%
-%
-%
-%
-%
-% Results:
-% graph of time and memmory usage for both approaches. 
-% operator norm of the resulting matricies of 12 qubit version.||M_1 - M_2|| (scipy/np.norm?) 
-%
-%
-%
-%
+
+% operator norm of the resulting matricies of 12 qubit version.||M_1 - M_2|| (np.norm(ord=2)) 

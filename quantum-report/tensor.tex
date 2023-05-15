@@ -1,5 +1,5 @@
 \section{Tensor Network Simulation}\label{sec:tensor}
-Tensors are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
+Tensors\cite{tensors} are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
 Each index has a dimension, for example a rank 2 tensor that is $m$ by $n$ would have one index $i$ with dimmension $n$ and another index $j$ with dimension $m$, we can then label an element in the tensor $a_{ij}$ where $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$. If we have more indecies they are sometimes written as $a_{ij}^{kl}$.
 We can use diagrams to draw these tensors, the tensors are repressented by red squares and the indecies are repressented by lines attaching to the square. The shape and colour of the tensors and the position of the lines typically do not matter, what is important is which of them are connected by shared indecies. 
 
@@ -91,6 +91,8 @@ The more general rule goes that you can change the rank of the tensor as much as
 The SVD\cite{SVD} is a mathematical operation that disassebles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. 
 
 
+\vspace{\baselineskip}
+\noindent
 To take advatage of this we have our 4x4 gates, they have two indecies that each have a dimension 4 but we reshape to 4 indecies with dimensions 2 - an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indecies we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$, and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So our matrix elements are divided like this 
 \begin{figure}[H]
     $$
@@ -591,6 +593,8 @@ So what can we do? We can compress the bonds in our MPO every now and then, to g
 \noindent 
 Compressing a MPO takes time, but frees up memory, it is therefor important to weigh these two against each other when implementing such a simulation, as we can get dramatic speedups by sacrificing a little memory, but due to the scaling of the bond dimensions we quickly end up having to compress to not run out of memory. 
 
+\vspace{\baselineskip}
+\noindent
 So far we have described how to take the vectors and matrix repressentations of gates and add dimmensions to them to make them fit our MPS and MPO repressentations. 
 We show how to take a matrix for a two qubit gate and split it into two seperate matricies. 
 We show how to contract a tensor network and how to compress an MPO after some amount of applications of other MPOs. 

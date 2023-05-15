@@ -1,27 +1,35 @@
 \section{Motivation}
 The Fourier transfrom is one of the most widely applicable procedures, used in anything from signal processing and AI to seismology. Therefor it is of interest to explore different ways of computing it. 
 
-
+\vspace{\baselineskip}
+\noindent
 A variant of it; the discrete Fourier transfrom takes a number of equally spaced points on a function 
 and transforms them into shifts and frequencies for a liniear combination of phase shifted sinus functions of different frequencies. 
 We can also do the opposite. 
-
 
 We can use this e.g. to remove an annoying high pitch noice in a recording: 
 We sample the sound wave, do the Fourier transformation to get the frequencies involved, 
 take out the higher pitced ones and do the inverse Fourier transfrom to recover the sound wave, now without the high pitched noice. 
 
 
+
+\vspace{\baselineskip}
+\noindent
 There are many ways of computing this discrete Fourier transform,
 one of the more well known approaches is the fast Fourier transform (FFT), which has been our most efficient way of computing it for a while. 
 There is an analogus algorithm designed for quantum computers namely the quantum Fourier transform (QFT). 
 
 
+
+\vspace{\baselineskip}
+\noindent
 In addition to its standalone value it is also widely used as a component of other quantum algorithms such as Shor's algorithm, and is therefor an intersting subject of improvement. 
 The QFT has a significantly better time complexity, but only when run on a quantum computer. The QFT takes $O(n^2)$ quantum gates and FFT takes $O(log_{2}(2^n) 2^n) = O(n2^n)$\cite{FFT_logic_gates} classical logic gates to compute for $2^n$ amplitudes or data points. For the QFT $n$ corresponds to the required number of qubits. 
-
 
 Recently there has been advancements in simulating the QFT approximatly on classical computers, while retaining some of this speedup, which is what this project focuses on. This has been shown in the paper\cite{the_paper} which will be refered to as 'the paper' in this paper. We will go though the math needed to implement two different simulations of the QFT, one exact and one approximate but vastly faster and more memmory efficient. The first only uses basic matrix math, the second requires a basic understanding of tensor networks which we will try to provide. This project also includes code implementing all the math touched upon by this paper and is intended as a learning resource, this means that the formulas shown will often not be the pretty driviations seen elsewhere but will seek to represent the individual bits that went into constructing them. 
 
 
+
+\vspace{\baselineskip}
+\noindent
 In the section \ref{sec:dense} we will show how to use matrix math to simulate the QFT, and in section \ref{sec:tensor} we will show how to compute an exponentially close approximation using tensors. We will then compare the time taken, the memory used and the approximation error between the approaches in section \ref{sec:results}. In the appendix there will be example calculations for many of the eqations shown later in this paper. 
