@@ -3,7 +3,7 @@ We want to simulate applying the QFT to some state, for this we need a way to re
 In this section we will work towards representing the QFT circuit as a matrix and the state as a vector. 
 \subsection{Representing a one qubit state}
 In classical computation a bit can either be 1 or 0, in quantum systems however a qubit has a certain probability of collapsing to either one or zero at a given time.
-To simulate this we use a vector to represent a qubit or a system of qubits, we denote this using Dirac notation. In Dirac notation we have a bra $\bra{}$ and a ket $\ket{}$, generally a bra denotes a row vector and a ket denotes a column vector.
+To simulate this, we use a vector to represent a qubit or a system of qubits, we denote this using Dirac notation. In Dirac notation we have a bra $\bra{}$ and a ket $\ket{}$, generally a bra denotes a row vector and a ket denotes a column vector.
 To extract the probabilities of a qubit or system of qubits collapsing to one state or the other we take the norm squared of the entries in the vector, the sum of these must be 1 to be a valid state.
 \newcommand{\qo}{\begin{bmatrix}
         0\\
@@ -58,17 +58,17 @@ To extract the probabilities of a qubit or system of qubits collapsing to one st
     \label{fig:q+}
 \end{figure}
 \noindent
-In general a qubit
-$
-\begin{bmatrix}
-    \alpha\\
-    \beta\\
-\end{bmatrix}
-= \alpha \ket{\qtz} + \beta \ket{\qto}
-$
-has a probability of $|\alpha|^2$ of collapsing to zero and $|\beta|^2$ of collapsing to one.
-Since we use a vector of complex numbers $|x|^2=xx^*$ denotes the norm squared, where if $x=a+bi$ then $x^*$ is the complex conjugate of $x$, $x^* =a-bi$.
-For readabilitys sake we will not write $+bi$ after a number if $b=0$, you can assume all numbers in vectors and matricies are complex.
+In general, a qubit 
+$ 
+\begin{bmatrix} 
+    \alpha\\ 
+    \beta\\ 
+\end{bmatrix} 
+= \alpha \ket{\qtz} + \beta \ket{\qto} 
+$ 
+has a probability of $|\alpha|^2$ of collapsing to zero and $|\beta|^2$ of collapsing to one. 
+Since we use a vector of complex numbers $|x|^2=xx^*$ denotes the norm squared, where if $x=a+bi$ then $x^*$ is the complex conjugate of $x$, $x^* =a-bi$. 
+For readability's sake we will not write $+bi$ after a number if $b=0$, you can assume all numbers in vectors and matrices are complex. 
 
 \vspace{\baselineskip}
 \noindent
@@ -98,7 +98,7 @@ In reality we often use complex numbers with a non-zero imaginary part in the ve
 
 \subsection{Multiple qubit states}
 $\ket{\qto\qtp\qtm}$ denotes a system collapsing to either $\ket{\qto\qtz\qtz}$, $\ket{\qto\qtz\qto}$, $\ket{\qto\qto\qtz}$ or $\ket{\qto\qto\qto}$ with probability 0.25. 
-If we want to compute the state vector for the whole system we take the Kronecker product\cite{kronecker_product}, sometimes called the tensor product, of the vectors representing the individual qubits in the system. 
+If we want to compute the state vector for the whole system, we take the Kronecker product\cite{kronecker_product}, sometimes called the tensor product, of the vectors representing the individual qubits in the system. 
 The Kronecker product of two matrix like objects consists of duplicating the second object for every entry in the first object and then scaling every value in the duplicate by the entry in the first object.
 \begin{figure}[H]
     \centering
@@ -231,7 +231,7 @@ The Kronecker product of two matrix like objects consists of duplicating the sec
     \label{fig:multi_qubit_state_computation}
 \end{figure}
 \noindent
-If we square this vector, equvilent to takeing the norm squared when the imaginary parts are zero,  we get the probability corresponding to each state.
+If we square this vector, equivalent to taking the norm squared when the imaginary parts are zero, we get the probability corresponding to each state. 
 \begin{figure}[H]
     \centering
     \begin{gather*}
@@ -258,7 +258,7 @@ If we square this vector, equvilent to takeing the norm squared when the imagina
             0.25\\
         \end{bmatrix}
     \end{gather*}
-    \caption{Squaring entries the in state vector to obtain probabilities of the system being in each state, the $i$'th entry in the vector is the probability of the system being in state $\ket{i}$ if you write $i$ in binary using 3 digits}
+    \caption{Squaring entries in the state vector to obtain probabilities of the system being in each state, the $i$'th entry in the vector is the probability of the system being in state $\ket{i}$ if you write $i$ in binary using 3 digits.}
     \label{fig:square_state}
 \end{figure}
 
@@ -298,19 +298,19 @@ In traditional electrical circuits we use logic gates such as NOT, AND, OR, NAND
         \qth = \qh\quad
         \qtr{n} = \qr{n}
     \end{align*}
-    \caption{Matrixes corresponding to $\qti$, $\qtx$, $\qth$ and $\qtr{n}$ gates, which act on a single cubit}
+    \caption{Matrixes corresponding to $\qti$, $\qtx$, $\qth$ and $\qtr{n}$ gates, which act on a single cubit.}
     \label{fig:single_qubit_gates}
 \end{figure}
 
 \noindent
-If we wish to apply a gate to a qubit in a system we do so by doing matrix multiplication between the state and the gate. 
+If we wish to apply a gate to a qubit in a system, we do so by doing matrix multiplication between the state and the gate. 
 \begin{figure}[H]
     \centering
     \begin{align*}
         \qti\ket{\qtz}=\ket{\qtz}\quad
         \qti\ket{\qto}=\ket{\qto}
     \end{align*}
-    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$.}
     \label{fig:i}
 \end{figure}
 
@@ -320,7 +320,7 @@ If we wish to apply a gate to a qubit in a system we do so by doing matrix multi
         \qtx\ket{\qtz}=\ket{\qto}\quad
         \qtx\ket{\qto}=\ket{\qtz}
     \end{align*}
-    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$.}
     \label{fig:x}
 \end{figure}
 
@@ -330,7 +330,7 @@ If we wish to apply a gate to a qubit in a system we do so by doing matrix multi
         \qth\ket{\qtz}=\ket{\qtp}\quad
         \qth\ket{\qto}=\ket{\qtm}
     \end{align*}
-    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$.}
     \label{fig:h}
 \end{figure}
 
@@ -344,7 +344,7 @@ If we wish to apply a gate to a qubit in a system we do so by doing matrix multi
             \mathrm{i}\\
         \end{bmatrix}
     \end{align*}
-    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$}
+    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$.}
     \label{fig:r2}
 \end{figure}
 
@@ -356,7 +356,7 @@ If we wish to apply a gate to a qubit in a system we do so by doing matrix multi
         \qtcx\ket{\qto\qtz}=\ket{\qto\qto}\quad
         \qtcx\ket{\qto\qto}=\ket{\qto\qtz}
     \end{align*}
-    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$}
+    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$.}
     \label{fig:cx}
 \end{figure}
 \noindent
@@ -372,7 +372,7 @@ A key property of quantum gates is that they are reversible, and in fact their o
         \qti(\qti\ket{\qtz})=\ket{\qtz}\quad
         \qti(\qti\ket{\qto})=\ket{\qto}
     \end{align*}
-    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \caption{Applying $\qti$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice.}
     \label{fig:i2}
 \end{figure}
 
@@ -382,7 +382,7 @@ A key property of quantum gates is that they are reversible, and in fact their o
         \qtx(\qtx\ket{\qtz})=\ket{\qtz}\quad
         \qtx(\qtx\ket{\qto})=\ket{\qto}
     \end{align*}
-    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \caption{Applying $\qtx$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice.}
     \label{fig:x2}
 \end{figure}
 
@@ -392,7 +392,7 @@ A key property of quantum gates is that they are reversible, and in fact their o
         \qth(\qth\ket{\qtz})=\ket{\qtz}\quad
         \qth(\qth\ket{\qto})=\ket{\qto}
     \end{align*}
-    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \caption{Applying $\qth$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice.}
     \label{fig:h2}
 \end{figure}
 
@@ -402,7 +402,7 @@ A key property of quantum gates is that they are reversible, and in fact their o
         \qtr{2}(\qtr{2}\ket{\qtz})=\ket{\qtz}\quad
         \qtr{2}(\qtr{2}\ket{\qto})=\ket{\qto}
     \end{align*}
-    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice}
+    \caption{Applying $\qtr{2}$ gate to the states $\ket{\qtz}$ and $\ket{\qto}$ twice.}
     \label{fig:r22}
 \end{figure}
 
@@ -414,7 +414,7 @@ A key property of quantum gates is that they are reversible, and in fact their o
         \qtcx(\qtcx\ket{\qto\qtz})=\ket{\qto\qtz}\quad
         \qtcx(\qtcx\ket{\qto\qto})=\ket{\qto\qto}
     \end{align*}
-    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$ twice}
+    \caption{Applying $\qtcx$ gate to the states $\ket{\qtz\qtz}$, $\ket{\qtz\qto}$, $\ket{\qto\qtz}$ and $\ket{\qto\qto}$ twice.}
     \label{fig:cx2}
 \end{figure}
 \noindent
@@ -430,7 +430,7 @@ which acts with identity on every other qubit. We again use the Kronecker produc
     \begin{align*}
         \left(\qti\otimes\qti\otimes\qtx\right)\ket{\qtz\qtz\qtz}=\ket{\qtz\qtz\qto}
     \end{align*}
-    \caption{Applying $\qtx$ to the first qubit in a 3 qubit system}
+    \caption{Applying $\qtx$ to the first qubit in a 3-qubit system.}
     \label{fig:individual_application1}
 \end{figure}
 
@@ -440,7 +440,7 @@ which acts with identity on every other qubit. We again use the Kronecker produc
     \begin{align*}
         \left(\qti\otimes\qtx\otimes\qti\right)\ket{\qtz\qtz\qtz}=\ket{\qtz\qto\qtz}
     \end{align*}
-    \caption{Applying $\qtx$ to the second qubit in a 3 qubit system}
+    \caption{Applying $\qtx$ to the second qubit in a 3-qubit system.}
     \label{fig:individual_application2}
 \end{figure}
 \begin{figure}[H]
@@ -448,17 +448,17 @@ which acts with identity on every other qubit. We again use the Kronecker produc
     \begin{align*}
         \left(\qtx\otimes\qti\otimes\qti\right)\ket{\qtz\qtz\qtz}=\ket{\qto\qtz\qtz}
     \end{align*}
-    \caption{Applying $\qtx$ to the thrid qubit in a 3 qubit system}
+    \caption{Applying $\qtx$ to the thrid qubit in a 3-qubit system.}
     \label{fig:individual_application3}
 \end{figure}
 \noindent
-If we want to apply multiple gates at a time we just replace the corresponding $\qti$ gates. 
+If we want to apply multiple gates at a time, we just replace the corresponding $\qti$ gates. 
 \begin{figure}[H]
     \centering
     \begin{align*}
         \left(\qtx\otimes\qti\otimes\qth\right)\ket{\qtz\qtz\qtz}=\ket{\qto\qtz\qtp}
     \end{align*}
-    \caption{Applying $\qtx$ to the thrid qubit and $\qth$ to the first qubit in a 3 qubit system}
+    \caption{Applying $\qtx$ to the thrid qubit and $\qth$ to the first qubit in a 3-qubit system.}
     \label{fig:applying_multiple_gates}
 \end{figure}
 \noindent
@@ -466,15 +466,15 @@ See calculations in appendix \ref{app:maniqi}.
 
 \vspace{\baselineskip}
 \noindent
-In general we can construct and apply any number of gates, $U_0,U_1,..,U_n$, to a state $\ket{\Psi}$ in sequence, this is in essence our quantum circuit. 
-And because of the assosiative nature of matrix multiplication we can combine the entire circuit before applying it to different states! 
-This saves tremendous amounts of resources when doing repetitative computations.
+In general, we can construct and apply any number of gates, $U_0,U_1,..,U_n$, to a state $\ket{\Psi}$ in sequence, this is in essence our quantum circuit.  
+And because of the associative nature of matrix multiplication, we can combine the entire circuit before applying it to different states!
+This saves tremendous amounts of resources when doing repetitive computations. 
 \begin{figure}[H]
     \centering
     \begin{gather*}
         U_0 U_1 .. U_n \ket{\Psi} = \left(\prod_{i=0}^n U_i\right) \ket{\Psi}\\
     \end{gather*}
-    \caption{Associative nature of matrix multiplication}
+    \caption{Associative nature of matrix multiplication.}
     \label{fig:assosiative}
 \end{figure}
 
@@ -489,7 +489,7 @@ This saves tremendous amounts of resources when doing repetitative computations.
             0 & 0 & \sqrt{0.5}  & \sqrt{0.5} \\
         \end{bmatrix}
     \end{align*}
-    \caption{Computing a matrix representation of a circuit,$\mathbf{U}$, that first applies $\qtx$ then $\qth$ to the first qubit then $\qtcx$ to the first and second qubit}
+    \caption{Computing a matrix representation of a circuit,$\mathbf{U}$, that first applies $\qtx$ then $\qth$ to the first qubit then $\qtcx$ to the first and second qubit.}
     \label{fig:circuit_matrix}
 \end{figure}
 \begin{figure}[H]
@@ -499,14 +499,14 @@ This saves tremendous amounts of resources when doing repetitative computations.
         \mathbf{U}\ket{\qto\qtz}&=-\ket{\qto\qtm}\\
         \mathbf{U}\ket{\qto\qto}&=\ket{\qto\qtp}
     \end{align*}
-    \caption{Applying the circuit represented by the matrix $\mathbf{U}$ from figure \ref{fig:circuit_matrix} to different states}
+    \caption{Applying the circuit represented by the matrix $\mathbf{U}$ from figure \ref{fig:circuit_matrix} to different states.}
     \label{fig:applying_circuit}
 \end{figure}
 
 
 \subsection{Controlled gates}
 \newcommand{\qtcr}[1]{\mathbf{CR_{#1}}}
-We have described the $\qtr{n}$ gate but for the $QFT$ circuit we need it controlled by another qubit. We can construct a controlled gate out of any other gate, we simply take the gate that should happen if the control qubit is $\ket{\qtz}$ and place it in the top left qudrant of a matrix, then place what should happen if it is $\ket{\qto}$ in the bottom right qudrant. 
+We have described the $\qtr{n}$ gate but for the $QFT$ circuit we need it controlled by another qubit. We can construct a controlled gate out of any other gate, we simply take the gate that should happen if the control qubit is $\ket{\qtz}$ and place it in the top left quadrant of a matrix, then place what should happen if it is $\ket{\qto}$ in the bottom right quadrant.  
 This can be expressed like so: 
 \begin{figure}[H]
     \begin{align*}
@@ -538,7 +538,7 @@ This can be expressed like so:
         \end{bmatrix}
         \otimes\mathbf{U}& 
     \end{align*}
-    \caption{Constructing a controled gate $\mathbf{CU_{1,2}}$ from a gate $\mathbf{U}$ where the first cubit controlls the second}
+    \caption{Constructing a controlled gate $\mathbf{CU_{1,2}}$ from a gate $\mathbf{U}$ where the first cubit controls the second. }
     \label{fig:CU1}
 \end{figure}
 \begin{figure}[H]
@@ -572,12 +572,12 @@ This can be expressed like so:
             0 & 1 \\
         \end{bmatrix}& 
     \end{align*}
-    \caption{Constructing a controled gate $\mathbf{CU_{2,1}}$ from a gate $\mathbf{U}$ where the second cubit controlls the first}
+    \caption{Constructing a controlled gate $\mathbf{CU_{2,1}}$ from a gate $\mathbf{U}$ where the second cubit controls the first. }
     \label{fig:CU1}
 \end{figure}
 \noindent
 In our case the controlling qubit is always after the $\qtr{n}$ gate so we only need the second formula. 
-It is important to note that the controlled gate, $\mathbf{U}$ in the examples, can be of any size, therefor it is not an issue that some of the controlled gates have 'empty' wires between them for example here is the result for a $\mathbf{CR_{3_{3,1}}}$ gate. 
+It is important to note that the controlled gate, $\mathbf{U}$ in the examples, can be of any size, therefore it is not an issue that some of the controlled gates have 'empty' wires between them for example here is the result for a $\mathbf{CR_{3_{3,1}}}$ gate. 
 \begin{figure}[H]
     \begin{align*}
         \mathbf{CR_{3_{3,1}}}=\qti\otimes\qti\otimes\ket{\qtz}\bra{\qtz} + \qtr{3}\otimes\qti\otimes\ket{\qto}\bra{\qto}&=\\
@@ -609,13 +609,13 @@ It is important to note that the controlled gate, $\mathbf{U}$ in the examples, 
             0 & 1 \\
         \end{bmatrix}& 
     \end{align*}
-    \caption{Constructing a controled gate $\mathbf{CR_{3_{3,1}}}$ from a gate $\qtr{3}$ where the second cubit controlls the first}
+    \caption{Constructing a controlled gate $\mathbf{CR_{3_{3,1}}}$ from a gate $\qtr{3}$ where the second cubit controls the first.}
     \label{fig:CR3}
 \end{figure}
 \noindent
 $\ket{\Psi}\bra{\Psi}$ is often called a projection on $\Psi$. 
 \subsection{The Quantum Fourier Transform}\label{sec:qft}
-Now we can represent a state as a vector and we have the building blocks for representing the QFT as a matrix. The $QFT_n$ circuit applies the QFT to a n qubit state and looks like this:
+Now we can represent a state as a vector and we have the building blocks for representing the QFT as a matrix. The $QFT_n$ circuit applies the QFT to a n-qubit state and looks like this:
 
 \begin{figure}[H]
     \centering
@@ -670,10 +670,10 @@ Now we can represent a state as a vector and we have the building blocks for rep
             \draw[thick,white,dashed] (v2_2)+(0.8,-3)--($(v2_2)+(4.8,-3)$){};
         \end{tikzpicture}
     }
-    \caption{circuit diagram of $QFT_n$}
+    \caption{Circuit diagram of $QFT_n$.}
     \label{fig:QTF_n}
 \end{figure}
-In essance this circuit diagram can be read:
+In essence this circuit diagram can be read:
 \begin{enumerate}
     \item apply the $\qth$ gate to the first qubit. 
     \item apply the $\qtr{2}$ gate to the first qubit controlled by the second qubit. 
@@ -694,7 +694,7 @@ $$x_{n}={\frac {1}{N}}\sum _{k=0}^{N-1}X_{k}\cdot e^{{\frac {i2\pi }{N}}kn}$$
 This is the inverse DFT.
 The QFT acts on a state $\ket{x}=\ket{x_0,x_1,...,x_{N-1}}$ and transforms it into the state $\ket{y}=\ket{y_0,y_1,...,y_{N-1}}$, the transformation is exactly: 
 $$y_{k}={\frac {1}{\sqrt {N}}}\sum _{n=0}^{N-1}x_{n}e^{{\frac {i2\pi }{N}}kn}$$
-We see that it is eqiuvalent to the inverse DFT.
+We see that it is equivalent to the inverse DFT.
 The QFT applied to a state is also sometimes written as 
 \begin{equation*}
 \resizebox{.9\hsize}{!}{${\text{QFT}}\ket{x_{1}x_{2}\ldots x_{n}} ={\frac {1}{\sqrt {N}}}\ \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n}]}\ket{\qto} \right)\otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n-1}x_{n}]}\ket{\qto} \right)\otimes \cdots \otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}\ket{\qto} \right)$}
@@ -726,16 +726,16 @@ For the case of $QFT_3\ket{x_1,x_2,x_3}$ we have that $x_2$ and $x_3$ is transfo
 This can be expressed with 
 $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}e^{\frac{2\pi i}{2^2}x_2}e^{\frac{2\pi i}{2^3}x_3}\ket{\qto})= \frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1+\frac{2\pi i}{2^2}x_2+\frac{2\pi i}{2^3}x_3}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1x_2x_3]}\ket{\qto})$.
 
-This pattern continues in a sort of recurcive definition of $QFT_n$ in terms of $QFT_{n-1}$ and one 'step' affecting the first qubit. 
+This pattern continues in a sort of recursive definition of $QFT_n$ in terms of $QFT_{n-1}$ and one 'step' affecting the first qubit. 
 
 
 \subsection{Putting it all together}
-With these tools we can now create a formula for constructing a n qubit state and a n qubit QFT circuit. 
+With these tools we can now create a formula for constructing a n-qubit state and a n-qubit QFT circuit. 
 \begin{figure}[H]
     \begin{align*}
         \ket{\Psi} = \ket{\Psi_1\Psi_2..\Psi_n} = \bigotimes_{i=1}^n \ket{\Psi_i}
     \end{align*}
-    \caption{Constructing the state vector for the n qubit state $\ket{\Psi}$}
+    \caption{Constructing the state vector for the n-qubit state $\ket{\Psi}$.}
     \label{fig:CPsi}
 \end{figure}
 \begin{figure}[H]
@@ -781,11 +781,11 @@ With these tools we can now create a formula for constructing a n qubit state an
             \right)
             \right)
     \end{align*}
-    \caption{Constructing the matrix for the n qubit QFT}
+    \caption{Constructing the matrix for the n-qubit QFT.}
     \label{fig:CQFT}
 \end{figure}
 \noindent
-This can be turned into pseudo code: 
+This can be turned into pseudo-code: 
 
 
 \hrule width \textwidth

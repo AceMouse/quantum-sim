@@ -1,7 +1,7 @@
 \section{Tensor Network Simulation}\label{sec:tensor}
-Tensors\cite{tensors} are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familliar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indecies you need to describe a single element in the tensor, e.g. you need 1 index to tell which element in a vector you are talking about and you need 2, namely a column and row index to uniquely specify an element in a matrix. 
-Each index has a dimension, for example a rank 2 tensor that is $m$ by $n$ would have one index $i$ with dimmension $n$ and another index $j$ with dimension $m$, we can then label an element in the tensor $a_{ij}$ where $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$. If we have more indecies they are sometimes written as $a_{ij}^{kl}$.
-We can use diagrams to draw these tensors, the tensors are repressented by red squares and the indecies are repressented by lines attaching to the square. The shape and colour of the tensors and the position of the lines typically do not matter, what is important is which of them are connected by shared indecies. 
+Tensors\cite{tensors} are mathematical objects with a lot in common with $n$-dimensional arrays. Some examples of tensors you are probably familiar with, a rank 0 tensor is just a scalar, a rank 1 tensor is a vector, a rank 2 tensor is a matrix, and so on. The rank of the tensor tells you how many indices you need to describe a single element in the tensor e.g., you need 1 index to tell which element in a vector you are talking about, and you need 2, namely a column and row index to uniquely specify an element in a matrix.  
+Each index has a dimension, for example a rank 2 tensor that is $m$ by $n$ would have one index $i$ with dimension $n$ and another index $j$ with dimension $m$, we can then label an element in the tensor $a_{ij}$ where $i\in \{0,1,..,n-1\}, j\in \{0,1,..,m-1\}$. If we have more indices, they are sometimes written as $a_{ij}^{kl}$. 
+We can use diagrams to draw these tensors, the tensors are represented by red squares and the indices are represented by lines attaching to the square. The shape and colour of the tensors and the position of the lines typically do not matter, what is important is which of them are connected by shared indices. 
 
 \begin{figure}[H]
     \centering 
@@ -20,12 +20,12 @@ We can use diagrams to draw these tensors, the tensors are repressented by red s
          node[draw=none,fill=none,font=\scriptsize,midway,below]{$i$};
         
     \end{tikzpicture}
-    \caption{rank 0, 1 and 2 tensor. Each index is repressented by a line}
+    \caption{Rank 0, 1 and 2 tensors. Each index is represented by a line.}
     \label{fig:r2t}
 \end{figure}
 
 \noindent
-Often the indecies are not labled on these drawings. If we have two tensors we can make them share an index if they each have an index with the same dimension. So if we have two rank 3 tensors, one where the dimensions of the indexes are $2, 3, 5$ and another where the dimensions are $1, 4, 3$, we can see that they both have an index of dimension 3 so if we wish we can make them share label for this index. Thus they could have the indecies $i, j, k$ and $l, m, j$, notice the reuse of $j$. 
+Often the indices are not labelled on these drawings. If we have two tensors, we can make them share an index if they each have an index with the same dimension. So, if we have two rank 3 tensors, one where the dimensions of the indexes are $2, 3, 5$ and another where the dimensions are $1, 4, 3$, we can see that they both have an index of dimension 3 so if we wish we can make them share label for this index. Thus, they could have the indices $i, j, k$ and $l, m, j$, notice the reuse of $j$. 
 
 \begin{figure}[H]
     \centering 
@@ -46,12 +46,12 @@ Often the indecies are not labled on these drawings. If we have two tensors we c
         \draw[](5, 2) -- (5, 3)  
          node[draw=none,fill=none,font=\scriptsize,midway,left]{$m$};
     \end{tikzpicture}
-    \caption{rank 3 tensors sharing index $j$.}
+    \caption{Rank 3 tensors sharing index $j$.}
     \label{fig:2r3t}
 \end{figure}
 \subsection{Contracting tensors }
 \noindent
-But what is this good for? In essence, when we make tensors share indecies it is a way to symbolise that we are \textit{contracting} them. The acctual computation of the contraction can be done at a later point we are just marking our intention. This is important as we might want to build an entire network of tensors and then be strategic about which shared indecies we choose to contract. Contracting a shared index is synonumus with computing the product of the two tensors. 
+But what is this good for? In essence, when we make tensors share indices it is a way to symbolise that we are \textit{contracting} them. The actual computation of the contraction can be done at a later point we are just marking our intention. This is important as we might want to build an entire network of tensors and then be strategic about which shared indices we choose to contract. Contracting a shared index is synonymous with computing the product of the two tensors. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -66,7 +66,7 @@ But what is this good for? In essence, when we make tensors share indecies it is
         \draw[](5, 2) -- (5, 3)  
          node[draw=none,fill=none,font=\scriptsize,midway,left]{$m$};
     \end{tikzpicture}
-    \caption{rank 4 tensor after contracting shared index $j$ from Figure \ref{fig:2r3t}.}
+    \caption{Rank 4 tensor after contracting shared index $j$ from Figure \ref{fig:2r3t}.}
     \label{fig:4t}
 \end{figure}
 \noindent
@@ -84,16 +84,16 @@ $\ket{\Psi} \rightarrow
     \begin{bmatrix}
         \ket{\Psi}
     \end{bmatrix}
-\end{bmatrix}$, this can be done for the gates as well, we just add indecies with dimension 1.  
-The more general rule goes that you can change the rank of the tensor as much as you want as long as the product of the dimensions is the same. By this logic we can always add indecies with dimension 1, but we can also split indecies in two as long as the product of the dimensions of the new indecies equals the old indexs dimensions. We can also combine indecies. This operation is often called reshaping.  
+\end{bmatrix}$, this can be done for the gates as well; we just add indices with dimension 1.  
+The more general rule goes that you can change the rank of the tensor as much as you want as long as the product of the dimensions is the same. By this logic we can always add indices with dimension 1, but we can also split indices in two as long as the product of the dimensions of the new indices equals the old index's dimensions. We can also combine indices. This operation is often called reshaping.  
 
 \subsection{Splitting two qubit gates into two tensors with a shared index }
-The SVD\cite{SVD} is a mathematical operation that disassebles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. 
+The SVD\cite{SVD} is a mathematical operation that disassembles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. 
 
 
 \vspace{\baselineskip}
 \noindent
-To take advatage of this we have our 4x4 gates, they have two indecies that each have a dimension 4 but we reshape to 4 indecies with dimensions 2 - an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indecies we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$, and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So our matrix elements are divided like this 
+To take advantage of this we have our 4x4 gates, they have two indices that each have a dimension 4 but we reshape to 4 indices with dimensions 2 - an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indices we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$, and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So, our matrix elements are divided like this: 
 \begin{figure}[H]
     $$
     \begin{bmatrix}
@@ -103,11 +103,11 @@ To take advatage of this we have our 4x4 gates, they have two indecies that each
         a_{1100} & a_{1101} & a_{1110} & a_{1111}\\
     \end{bmatrix}
     $$
-    \caption{Matrix element indecies}
-    \label{fig:matrix_indecies}
+    \caption{Matrix element indices.}
+    \label{fig:matrix_indices}
 \end{figure}
 \noindent
-Unfortunately the SVD splits vertically, i.e in this case we would be splitting the gate between the inputs and outputs, but we are interested in splitting between the two qubits, so $i_1$ and $o_1$ are seperate from $i_2$ and $o_2$. Luckily we can just swap around the indecies and thus elements beforehand, we just have to remember to swap them back when all is set and done. 
+Unfortunately, the SVD splits vertically i.e., in this case we would be splitting the gate between the inputs and outputs, but we are interested in splitting between the two qubits, so $i_1$ and $o_1$ are separate from $i_2$ and $o_2$. Luckily, we can just swap around the indices and thus elements beforehand, we just have to remember to swap them back when all is set and done.
 \begin{figure}[H]
     $$
     \begin{bmatrix}
@@ -117,7 +117,7 @@ Unfortunately the SVD splits vertically, i.e in this case we would be splitting 
         a_{1010} & a_{1011} & a_{1110} & a_{1111}\\
     \end{bmatrix}
     $$
-    \caption{Indecies swapped}
+    \caption{Indices swapped.}
     \label{fig:matrix_swapped}
 \end{figure}
 
@@ -140,7 +140,7 @@ Unfortunately the SVD splits vertically, i.e in this case we would be splitting 
         \draw[] (3,0.25) -- (3.5,0.25) node[midway,above]{$o_2$};
         \draw[] (3,0.75) -- (3.5,0.75) node[midway,above]{$o_1$};
     \end{tikzpicture}
-    \caption{SVD whithout swapping}
+    \caption{SVD without swapping.}
     \label{fig:svd_no_swap}
 \end{figure}
 \begin{figure}[H]
@@ -168,11 +168,11 @@ Unfortunately the SVD splits vertically, i.e in this case we would be splitting 
         \draw[] (3,0.25) -- (3.5,0.25) node[midway,above]{$o_2$};
         \draw[] (3,0.75) -- (3.5,0.75) node[midway,above]{$i_2$};
     \end{tikzpicture}
-    \caption{SVD whith swapping}
+    \caption{SVD with swapping.}
     \label{fig:svd_swap}
 \end{figure}
 \noindent
-We do though want to express this using two tensors only, but this is fortunately easy as we can just split $\Lambda$ by squaring every value in it. Now we can contract two indecies and get the result we want. 
+We do though want to express this using two tensors only, but this is fortunately easy as we can just split $\Lambda$ by squaring every value in it. Now we can contract two indices and get the result we want. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -211,9 +211,9 @@ We do though want to express this using two tensors only, but this is fortunatel
 \noindent
 This whole process is sometimes called the operator Schmidt decomposition\cite{osd}.  
 
-\subsection{Repressenting a circuit and state using tensors}
+\subsection{representing a circuit and state using tensors}
 \noindent
-We can use a tensor network to represent our $QFT$ circuit and our state. We will use a matrix product state (MPS) to represent our state, and a matrix product operator (MPO) to repressent our circuit, these are just sub categories of tensor networks. 
+We can use a tensor network to represent our $QFT$ circuit and our state. We will use a matrix product state (MPS) to represent our state, and a matrix product operator (MPO) to represent our circuit, these are just subcategories of tensor networks. 
 
 \begin{figure}[H]
     \centering 
@@ -225,7 +225,7 @@ We can use a tensor network to represent our $QFT$ circuit and our state. We wil
         }
         \draw[fill=red] (0,-0.5) rectangle (0.5,-4) node[pos=0.5]{};
     \end{tikzpicture}
-    \caption{4 qubit state repressented as a tensor. (MPS)}
+    \caption{4-qubit state represented as a tensor (MPS).}
     \label{fig:psi4t}
 \end{figure}
 \noindent
@@ -241,12 +241,12 @@ Here we have the whole state in one large tensor. This is highly undesirable as 
         }
         \draw[fill=green] (0,-2) rectangle (0.5,-2+0.5) node[pos=0.5]{};
     \end{tikzpicture}
-    \caption{4 qubit state $\ket{0010}$ repressented as a tensor network (MPS). Red represents $\ket{0}$ and green $\ket{1}$. }
+    \caption{4-qubit state $\ket{0010}$ represented as a tensor network (MPS). Red represents $\ket{0}$ and green $\ket{1}$. }
     \label{fig:psi4t_mps}
 \end{figure}
 \noindent
-Here we reshape the tensors repressenting each qubit to fit with our network structure. They simply have shared indecies of size 1 connecting them. 
-Now let us look at repressenting the QFT as a MPO:
+Here we reshape the tensors representing each qubit to fit with our network structure. They simply have shared indices of size 1 connecting them. 
+Now let us look at representing the QFT as a MPO:
 \begin{figure}[H]
     \centering 
     \scalebox{0.57}{
@@ -284,11 +284,11 @@ Now let us look at repressenting the QFT as a MPO:
         \draw[fill=green] (15,-3) rectangle (0.5+15,-0.5-3) node[pos=0.5]{};
     \end{tikzpicture}
     }
-    \caption{$QFT_4$ repressented as a tensor network (MPO). White repressents an identity gate, green a Hadamard gate, red a controlled $R_x,x\in \{2,3,4\}$ gate, and yellow a swap gate.}
+    \caption{$QFT_4$ represented as a tensor network (MPO). White represents an identity gate, green a Hadamard gate, red a controlled $R_x,x\in \{2,3,4\}$ gate, and yellow a swap gate.}
     \label{fig:qft4t}
 \end{figure}
 \noindent
-Now you might ask why we suddenly are using a ton of swap gates, and what are they even. Swap gates simply swap the values of two qubits, so if $\ket{10}$ goes in $\ket{01}$ commes out. This is simulated with this matrix, when swapping adjacent qubits as we are. 
+Now you might ask why we suddenly are using a ton of swap gates, and what are they even. Swap gates simply swap the values of two qubits, so if $\ket{10}$ goes in $\ket{01}$ comes out. This is simulated with this matrix, when swapping adjacent qubits as we are. 
 \begin{figure}[H]
     \centering
     $$
@@ -304,8 +304,8 @@ Now you might ask why we suddenly are using a ton of swap gates, and what are th
 \end{figure}
 
 \noindent
-We do this to avoid having non-local gates in the circuit, such as the controlled $R_x$ gates we use in the QFT. This was not a concern when doing the dense simulation, but here we have to split everything up into tensors acting on individual qubits and therefor would like smaller gates to start with. The reason we have to split everything up is mostly a limitation of the liberary we are using for the simulation, it is a perfectly vallid tensor network even without splitting every gate. It does add a cost of slightly less than two swap gates per non-local gate. 
-This low overhead is not something that can be achieved in general, the most general way to make every gate local requres swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swapgates equal to the number of qubits between the two target qubits times two. We are fortunately in a situation where we can do this in a smarter way. 
+We do this to avoid having non-local gates in the circuit, such as the controlled $R_x$ gates we use in the QFT. This was not a concern when doing the dense simulation, but here we have to split everything up into tensors acting on individual qubits and therefore would like smaller gates to start with. The reason we have to split everything up is mostly a limitation of the library\cite{quimb} we are using for the simulation; it is a perfectly valid tensor network even without splitting every gate. It does add a cost of slightly less than two swap gates per non-local gate.  
+This low overhead is not something that can be achieved in general, the most general way to make every gate local requires swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swap gates equal to the number of qubits between the two target qubits times two. We are fortunately in a situation where we can do this in a smarter way. 
 \begin{figure}[H]
     \centering 
     \scalebox{0.57}{
@@ -366,11 +366,11 @@ This low overhead is not something that can be achieved in general, the most gen
             \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
         }
     \end{tikzpicture}
-    \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horisontal' shared indecies contracted.}
+    \caption{$QFT_4$ from figure \ref{fig:qft4t_svd} with 'horizontal' shared indices contracted.}
     \label{fig:mpo}
 \end{figure}
 \noindent 
-We have used the operator Schmidt decomposition to split the two qubit gates such that we can apply them to each of our qubits seperately. 
+We have used the operator Schmidt decomposition to split the two qubit gates such that we can apply them to each of our qubits separately.  
 \noindent
 Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS by connecting the outputs from the MPS to the inputs of the MPO and contracting those shared indexes. This results in an updated MPS. If we wish to combine two MPOs into one we do the same, just connecting the output of one to the input of another and contracting. 
 
@@ -412,7 +412,7 @@ Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS b
 \end{figure}
 
 \noindent
-After splitting a gate which acts on more than one qubit the index they share will have a dimension of 1 or larger, and when we contract a MPO like so, we can see that the dimension scales quite quickly, with the layers if we do not do something: 
+After splitting a gate which acts on more than one qubit the index, they share will have a dimension of 1 or larger, and when we contract a MPO like so, we can see that the dimension scales quite quickly, with the layers if we do not do something: 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -450,7 +450,7 @@ After splitting a gate which acts on more than one qubit the index they share wi
     \label{fig:mpo_contraction}
 \end{figure}
 \noindent 
-So what can we do? We can compress the bonds in our MPO every now and then, to get them back to a managable size, this is possible since we know our QFT has a fixed max bond dimension. The way we do it is to go though our bonds, e.g from top to bottom and contract then re-split them using the SVD. This will help, but we can do better if we are willing to pay a little accuracy, we can truncate the singular values to only the ones that contribute the most, and cut out those that do not contribute a lot to the result. In the QFT circuit it has been shown that the singular values decrese exponentially so we don't lose much precission.   
+So, what can we do? We can compress the bonds in our MPO every now and then, to get them back to a manageable size, this is possible since we know our QFT has a fixed max bond dimension. The way we do it is to go through our bonds, e.g. from top to bottom and contract then re-split them using the SVD. This will help, but we can do better if we are willing to pay a little accuracy, we can truncate the singular values to only the ones that contribute the most and cut out those that do not contribute a lot to the result. In the QFT circuit it has been shown that the singular values decrease exponentially so we don't lose much precission.    
 
 \begin{figure}[H]
     \centering
@@ -591,12 +591,9 @@ So what can we do? We can compress the bonds in our MPO every now and then, to g
     \label{fig:compress}
 \end{figure}
 \noindent 
-Compressing a MPO takes time, but frees up memory, it is therefor important to weigh these two against each other when implementing such a simulation, as we can get dramatic speedups by sacrificing a little memory, but due to the scaling of the bond dimensions we quickly end up having to compress to not run out of memory. 
+Compressing a MPO takes time, but frees up memory, it is therefore important to weigh these two against each other when implementing such a simulation, as we can get dramatic speedups by sacrificing a little memory, but due to the scaling of the bond dimensions we quickly end up having to compress to not run out of memory. 
 
 \vspace{\baselineskip}
 \noindent
-So far we have described how to take the vectors and matrix repressentations of gates and add dimmensions to them to make them fit our MPS and MPO repressentations. 
-We show how to take a matrix for a two qubit gate and split it into two seperate matricies. 
-We show how to contract a tensor network and how to compress an MPO after some amount of applications of other MPOs. 
-We use this to repressent the QFT as a tensor network using only local gates, using swap gates in the construction.
+So far, we have described how to take the vectors and matrix representations of gates and add dimensions to them to make them fit our MPS and MPO representations. We show how to take a matrix for a two-qubit gate and split it into two separate matrices. We show how to contract a tensor network and how to compress an MPO after some number of applications of other MPOs. We use this to represent the QFT as a tensor network using only local gates, using swap gates in the construction. 
 
