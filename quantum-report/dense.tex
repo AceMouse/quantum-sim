@@ -1,10 +1,10 @@
 \section{Dense Simulation}\label{sec:dense}
 We want to simulate applying the QFT to some state, for this we need a way to represent the QFT and the state. 
-in this section we will work towards representing the QFT circuit as a matrix and the state as a vector. 
+In this section we will work towards representing the QFT circuit as a matrix and the state as a vector. 
 \subsection{Representing a one qubit state}
 In classical computation a bit can either be 1 or 0, in quantum systems however a qubit has a certain probability of collapsing to either one or zero at a given time.
 To simulate this we use a vector to represent a qubit or a system of qubits, we denote this using Dirac notation. In Dirac notation we have a bra $\bra{}$ and a ket $\ket{}$, generally a bra denotes a row vector and a ket denotes a column vector.
-To extract the probabilities of a qubit or system of qubits collapsing to one state or the other wetake the norm squared of the entries in the vector, the sum of these must be 1 to be a valid state.
+To extract the probabilities of a qubit or system of qubits collapsing to one state or the other we take the norm squared of the entries in the vector, the sum of these must be 1 to be a valid state.
 \newcommand{\qo}{\begin{bmatrix}
         0\\
         1\\
@@ -235,17 +235,17 @@ If we square this vector, equvilent to takeing the norm squared when the imagina
 \begin{figure}[H]
     \centering
     \begin{gather*}
-        \ket{\qto\qtp\qtm}^2=
+        |\ket{\qto\qtp\qtm}|^2=
         \begin{bmatrix}
-            0\\
-            0\\
-            0\\
-            0\\
-            0.5\\
-            -0.5\\
-            0.5\\
-            -0.5\\
-        \end{bmatrix}^2
+            0^2\\
+            0^2\\
+            0^2\\
+            0^2\\
+            0.5^2\\
+            -0.5^2\\
+            0.5^2\\
+            -0.5^2\\
+        \end{bmatrix}
         =
         \begin{bmatrix}
             0\\
@@ -468,7 +468,7 @@ See calculations in appendix \ref{app:maniqi}.
 \noindent
 In general we can construct and apply any number of gates, $U_0,U_1,..,U_n$, to a state $\ket{\Psi}$ in sequence, this is in essence our quantum circuit. 
 And because of the assosiative nature of matrix multiplication we can combine the entire circuit before applying it to different states! 
-This saves tremendously when doing repetitative computations.
+This saves tremendous amounts of resources when doing repetitative computations.
 \begin{figure}[H]
     \centering
     \begin{gather*}
@@ -506,7 +506,7 @@ This saves tremendously when doing repetitative computations.
 
 \subsection{Controlled gates}
 \newcommand{\qtcr}[1]{\mathbf{CR_{#1}}}
-We have described the $\qtr{n}$ gate but for the $QFT$ circuit we need it controlled by another cubit. We can construct a controlled gate out of any other gate we simply take the gate that should happen if the control qubit is $\ket{\qtz}$ and place it in the top left qudrant of a matrix, then place what should happen if it is $\ket{\qto}$ in the bottom right qudrant. 
+We have described the $\qtr{n}$ gate but for the $QFT$ circuit we need it controlled by another qubit. We can construct a controlled gate out of any other gate, we simply take the gate that should happen if the control qubit is $\ket{\qtz}$ and place it in the top left qudrant of a matrix, then place what should happen if it is $\ket{\qto}$ in the bottom right qudrant. 
 This can be expressed like so: 
 \begin{figure}[H]
     \begin{align*}
@@ -612,7 +612,8 @@ It is important to note that the controlled gate, $\mathbf{U}$ in the examples, 
     \caption{Constructing a controled gate $\mathbf{CR_{3_{3,1}}}$ from a gate $\qtr{3}$ where the second cubit controlls the first}
     \label{fig:CR3}
 \end{figure}
-
+\noindent
+$\ket{\Psi}\bra{\Psi}$ is often called a projection on $\Psi$. 
 \subsection{The Quantum Fourier Transform}\label{sec:qft}
 Now we can represent a state as a vector and we have the building blocks for representing the QFT as a matrix. The $QFT_n$ circuit applies the QFT to a n qubit state and looks like this:
 
@@ -686,27 +687,26 @@ In essance this circuit diagram can be read:
     \item ... 
     \item apply the $\qth$ gate to the last qubit. 
 \end{enumerate}
-This is all well and good, but how does this circuit end up performing a discrete Fourier transform? The definition of the DFT is given by this formula:
+This is all well and good, but how does this circuit end up performing a discreet Fourier transform? The definition of the DFT is given by this formula:
 $$X_{k}=\sum _{n=0}^{N-1}x_{n}\cdot e^{-{\frac {i2\pi }{N}}kn}$$
-where $x$ is the input vector and $X$ is the output vector, the subscribts are used for indexing in the vectors. 
+where $x$ is the input vector and $X$ is the output vector, the subscripts are used for indexing in the vectors. 
 $$x_{n}={\frac {1}{N}}\sum _{k=0}^{N-1}X_{k}\cdot e^{{\frac {i2\pi }{N}}kn}$$
 This is the inverse DFT.
 The QFT acts on a state $\ket{x}=\ket{x_0,x_1,...,x_{N-1}}$ and transforms it into the state $\ket{y}=\ket{y_0,y_1,...,y_{N-1}}$, the transformation is exactly: 
-$$y_{k}={\frac {1}{\sqrt {N}}}\sum _{n=0}^{N-1}x_{n}e^{{\frac {i2\pi }{N}}kn},\quad k=0,1,2,\ldots ,N-1$$
-we see that it is eqiuvalent to the inverse DFT.
+$$y_{k}={\frac {1}{\sqrt {N}}}\sum _{n=0}^{N-1}x_{n}e^{{\frac {i2\pi }{N}}kn}$$
+We see that it is eqiuvalent to the inverse DFT.
 The QFT applied to a state is also sometimes written as 
 \begin{equation*}
-\resizebox{.9\hsize}{!}{${\text{QFT}}(|x_{1}x_{2}\ldots x_{n}\rangle )={\frac {1}{\sqrt {N}}}\ \left(|0\rangle +e^{2\pi i\,[0.x_{n}]}|1\rangle \right)\otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n-1}x_{n}]}|1\rangle \right)\otimes \cdots \otimes \left(|0\rangle +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}|1\rangle \right)$}
+\resizebox{.9\hsize}{!}{${\text{QFT}}\ket{x_{1}x_{2}\ldots x_{n}} ={\frac {1}{\sqrt {N}}}\ \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n}]}\ket{\qto} \right)\otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n-1}x_{n}]}\ket{\qto} \right)\otimes \cdots \otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}\ket{\qto} \right)$}
 \end{equation*}
-and if we don't apply the swaps in the end of the QFT we get 
+where $[b_0.b_1b_2b_3...b_n]=\Sigma^{n}_{i=0}\frac{b_i}{2^i}$, so a binary number\cite{osd}. If we don't apply the swaps in the end of the QFT we get 
 \begin{equation*}
-\resizebox{.9\hsize}{!}{${\text{QFT}}(|x_{1}x_{2}\ldots x_{n}\rangle )={\frac {1}{\sqrt {N}}}\ \left(|0\rangle +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}|1\rangle \right)\otimes \cdots \otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n-1}x_{n}]}|1\rangle \right)\otimes \left(|0\rangle +e^{2\pi i\,[0.x_{n}]}|1\rangle \right)$}
+    \resizebox{.9\hsize}{!}{${\text{QFT}}\ket{x_{1}x_{2}\ldots x_{n}}={\frac {1}{\sqrt {N}}}\ \left(\ket{\qtz} +e^{2\pi i\,[0.x_{1}x_{2}\ldots x_{n}]}\ket{\qto} \right)\otimes \cdots \otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n-1}x_{n}]}\ket{\qto} \right)\otimes \left(\ket{\qtz} +e^{2\pi i\,[0.x_{n}]}\ket{\qto} \right)$}
 \end{equation*}
 But how does the circuit laid out above result in this formula?
 Let us first look at $QFT_1\ket{x_1}$, which is just $\qth\ket{x_1}$ this can be written as $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}\ket{\qto})$.
 We see here that if $x_1$ is 1 we have $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\pi i}\ket{\qto})$ and if it is 0 we have $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{0}\ket{\qto})$ whitch is equivalent to $\frac{1}{\sqrt{2^1}}(\ket{\qtz}-\ket{\qto})=H\ket{\qto}$ and $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+\ket{\qto})=H\ket{\qtz}$. 
 To make the equation match the one from the definition we can say $\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{\frac{2\pi i}{2^1}x_1}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i\frac{x_1}{2^1}}\ket{\qto})=\frac{1}{\sqrt{2^1}}(\ket{\qtz}+e^{2\pi i[0.x_1]}\ket{\qto})$. 
-Here $[b_0.b_1b_2b_3...b_n]=\Sigma^{n}_{i=0}\frac{b_i}{2^i}$, so a binary number.  
 
 
 For the case of $QFT_2\ket{x_1,x_2}$ we have that $x_2$ is transformed in the same way as $x_1$ in $QFT_1$ and $x_1$ is now transformed like so $\qth\ket{x_1}$ if $x_2=0$ and $\qth\qtr{2}\ket{x_1}$ if $x_2=1$. 

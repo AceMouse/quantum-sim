@@ -88,7 +88,10 @@ $\ket{\Psi} \rightarrow
 The more general rule goes that you can change the rank of the tensor as much as you want as long as the product of the dimensions is the same. By this logic we can always add indecies with dimension 1, but we can also split indecies in two as long as the product of the dimensions of the new indecies equals the old indexs dimensions. We can also combine indecies. This operation is often called reshaping.  
 
 \subsection{Splitting two qubit gates into two tensors with a shared index }
-The SVD is a mathematical operation that disassebles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. To take advatage of this we have our 4x4 gates, they have two indecies that each have a dimension 4 but we reshape to 4 indecies with dimensions 2, an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indecies we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$ and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So our matrix elements are divided like this 
+The SVD\cite{SVD} is a mathematical operation that disassebles a matrix A into a matrix U, a vector of singular values $\lambda$ and a matrix V, which upholds the property $A=U\Lambda Vh$ where $\Lambda$ is a matrix where the diagonal corresponds to the values of $\lambda$ and all the other elements are 0, and Vh is the conjugate transpose of V. 
+
+
+To take advatage of this we have our 4x4 gates, they have two indecies that each have a dimension 4 but we reshape to 4 indecies with dimensions 2 - an input for each qubit and an output for each. So if we describe our matrix elements with regards to these indecies we can say an element $a_{i_1i_2o_1o_2}$ is in either the top half or the bottom half depending on $i_1$, and in the left half or right half depending on $o_1$ this gives us a sub matrix that is 2x2, which we divide the same way using $i_2$ and $o_2$. So our matrix elements are divided like this 
 \begin{figure}[H]
     $$
     \begin{bmatrix}
@@ -102,7 +105,7 @@ The SVD is a mathematical operation that disassebles a matrix A into a matrix U,
     \label{fig:matrix_indecies}
 \end{figure}
 \noindent
-Unfortunately the SVD splits vertically, i.e in this case we would be splitting the gate between the inputs and outputs, but we are interested in splitting between the two qubits, so $i_1$ and $o_1$ are seperate from $i_2$ and $o_2$. Lukily we can just swap around the indecies and thus elements beforehand, we just have to remember to swap them back when all is set and done. 
+Unfortunately the SVD splits vertically, i.e in this case we would be splitting the gate between the inputs and outputs, but we are interested in splitting between the two qubits, so $i_1$ and $o_1$ are seperate from $i_2$ and $o_2$. Luckily we can just swap around the indecies and thus elements beforehand, we just have to remember to swap them back when all is set and done. 
 \begin{figure}[H]
     $$
     \begin{bmatrix}
@@ -167,7 +170,7 @@ Unfortunately the SVD splits vertically, i.e in this case we would be splitting 
     \label{fig:svd_swap}
 \end{figure}
 \noindent
-We do though want to express this using two tensors only, but this is fortunatly easy as we can just split $\Lambda$ by squaring every value in it. Now we can contract two indecies and get the result we want. 
+We do though want to express this using two tensors only, but this is fortunately easy as we can just split $\Lambda$ by squaring every value in it. Now we can contract two indecies and get the result we want. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -204,7 +207,7 @@ We do though want to express this using two tensors only, but this is fortunatly
     \label{fig:svd_combine}
 \end{figure}
 \noindent
-This whole process is sometimes called the operator Schmidt decomposition. 
+This whole process is sometimes called the operator Schmidt decomposition\cite{osd}.  
 
 \subsection{Repressenting a circuit and state using tensors}
 \noindent
@@ -225,7 +228,6 @@ We can use a tensor network to represent our $QFT$ circuit and our state. We wil
 \end{figure}
 \noindent
 Here we have the whole state in one large tensor. This is highly undesirable as this uses a lot of memory, we would rather construct a network of tensors. Let us take the state $\ket{0010}$ as an example.
-%TODO: explain SVD and why we use swap gates. 
 \begin{figure}[H]
     \centering 
     \begin{tikzpicture}
@@ -235,7 +237,7 @@ Here we have the whole state in one large tensor. This is highly undesirable as 
                 \draw[](0.5, -\i +0.25) -- (1, -\i +0.25); 
                 \draw[fill=red] (0,-\i) rectangle (0.5,-\i+0.5) node[pos=0.5]{};
         }
-        \draw[fill=green] (0,-3) rectangle (0.5,-3+0.5) node[pos=0.5]{};
+        \draw[fill=green] (0,-2) rectangle (0.5,-2+0.5) node[pos=0.5]{};
     \end{tikzpicture}
     \caption{4 qubit state $\ket{0010}$ repressented as a tensor network (MPS). Red represents $\ket{0}$ and green $\ket{1}$. }
     \label{fig:psi4t_mps}
@@ -301,7 +303,7 @@ Now you might ask why we suddenly are using a ton of swap gates, and what are th
 
 \noindent
 We do this to avoid having non-local gates in the circuit, such as the controlled $R_x$ gates we use in the QFT. This was not a concern when doing the dense simulation, but here we have to split everything up into tensors acting on individual qubits and therefor would like smaller gates to start with. The reason we have to split everything up is mostly a limitation of the liberary we are using for the simulation, it is a perfectly vallid tensor network even without splitting every gate. It does add a cost of slightly less than two swap gates per non-local gate. 
-This low overhead is not something that can be achieved in general, the most general way to make every gate local requres swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swapgates equal to the number of qubits between the two target qubits times two. We are fortunatly in a situation where we can do this in a smarter way. 
+This low overhead is not something that can be achieved in general, the most general way to make every gate local requres swapping the two qubits with the ones between them until they are adjacent, applying the gate, and then swapping them back to where they came from, this takes swapgates equal to the number of qubits between the two target qubits times two. We are fortunately in a situation where we can do this in a smarter way. 
 \begin{figure}[H]
     \centering 
     \scalebox{0.57}{
@@ -349,7 +351,7 @@ This low overhead is not something that can be achieved in general, the most gen
         \draw[fill=green] (15,-3) rectangle (0.5+15,-0.5-3) node[pos=0.5]{};
     \end{tikzpicture}
     }
-    \caption{$QFT_4$ from figure \ref{fig:qft4t} with all two qubit gates split using SVD.}
+    \caption{$QFT_4$ from figure \ref{fig:qft4t} with all two qubit gates split using the operator Schmidt decomposition.}
     \label{fig:qft4t_svd}
 \end{figure} 
 \begin{figure}[H]
@@ -366,9 +368,9 @@ This low overhead is not something that can be achieved in general, the most gen
     \label{fig:mpo}
 \end{figure}
 \noindent 
-We have used the singular value decomposition to split the two qubit gates such that we can apply them to each of our qubits seperately. 
+We have used the operator Schmidt decomposition to split the two qubit gates such that we can apply them to each of our qubits seperately. 
 \noindent
-Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS by connecting the outputs from the MPS to the inputs to the MPO and contracting those shared indexes. This results in an updated MPS. If we wish to combine two MPOs into one we do the same, just connecting the output of one to the input of another and contracting. 
+Now that we have our state MPS and our QFT MPO we can apply the MPO to the MPS by connecting the outputs from the MPS to the inputs of the MPO and contracting those shared indexes. This results in an updated MPS. If we wish to combine two MPOs into one we do the same, just connecting the output of one to the input of another and contracting. 
 
 \begin{figure}[H]
     \centering 
@@ -442,11 +444,11 @@ After splitting a gate which acts on more than one qubit the index they share wi
         \draw[] (0.25+6,-1) -- (0.25+6,-1-0.5) node[font=\scriptsize,midway,left]{$d_{2}$};
     \end{tikzpicture}
 
-    \caption{MPO with vertical bond dimensions $d_{ij}$}
+    \caption{MPO with vertical bond dimensions $d_{i}.$}
     \label{fig:mpo_contraction}
 \end{figure}
 \noindent 
-So what can we do? We can compress the bonds in our MPO every now and then, to get them back to a managable size, this is possible since we know our QFT has a fixed max bond dimension. The way we do it is to go though our bonds, e.g from top to bottom and contract then re-split them using SVD. This will help, but we can do better if we are willing to pay a little accuracy, we can truncate the singular values to only the ones that contribute the most, and cut out those that do not contribute a lot to the result. In the QFT circuit it has been shown that the singular values decrese exponentially so we don't lose much precission.   
+So what can we do? We can compress the bonds in our MPO every now and then, to get them back to a managable size, this is possible since we know our QFT has a fixed max bond dimension. The way we do it is to go though our bonds, e.g from top to bottom and contract then re-split them using the SVD. This will help, but we can do better if we are willing to pay a little accuracy, we can truncate the singular values to only the ones that contribute the most, and cut out those that do not contribute a lot to the result. In the QFT circuit it has been shown that the singular values decrese exponentially so we don't lose much precission.   
 
 \begin{figure}[H]
     \centering
@@ -587,10 +589,10 @@ So what can we do? We can compress the bonds in our MPO every now and then, to g
     \label{fig:compress}
 \end{figure}
 \noindent 
-compressing a MPO takes time, but frees up memory, it is therefor important to weigh these two against eachother when implementing such a simulation, as we can get dramatic speedups by sacrificing a little memory, but due to the scaling of the bonds dimensions we quickly end up having to compress to not run out of memory. 
+Compressing a MPO takes time, but frees up memory, it is therefor important to weigh these two against each other when implementing such a simulation, as we can get dramatic speedups by sacrificing a little memory, but due to the scaling of the bond dimensions we quickly end up having to compress to not run out of memory. 
 
 So far we have described how to take the vectors and matrix repressentations of gates and add dimmensions to them to make them fit our MPS and MPO repressentations. 
-We show how to take a matrix for a two qubit gate and split it into two seperate matrixes. 
+We show how to take a matrix for a two qubit gate and split it into two seperate matricies. 
 We show how to contract a tensor network and how to compress an MPO after some amount of applications of other MPOs. 
 We use this to repressent the QFT as a tensor network using only local gates, using swap gates in the construction.
 
