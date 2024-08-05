@@ -17,6 +17,9 @@ _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
 _S = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]], dtype=complex)
+_s = np.array([[1,0],[0,1j]], dtype=complex)
+_Z = np.array([[1,0],[0,-1]], dtype=complex)
+_Y = np.array([[0,-1j],[1j,0]], dtype=complex)
 
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
@@ -38,7 +41,7 @@ def I(k, begining=False, end=False):
             return [_I.reshape(2,2)]
         elif begining or end:
             return [_I.reshape(1,2,2)]
-        return [_I]
+        return [_I.reshape(1,1,2,2)]
     return [_I.reshape(1,2,2) if begining else _I.reshape(1,1,2,2)] + ([_I.reshape(1,1,2,2)]*(k-2)) + [_I.reshape(1,2,2) if end else _I.reshape(1,1,2,2)]
 
 def swapBits(x, p1, p2, n):
@@ -88,6 +91,17 @@ def U(_U, t, n):
         _U = _U.reshape(1,2,2)
     return before+[_U]+after
     
+def printm(m):
+    for i in m:
+        for x in i:
+            if x != 0j:
+                if x.real >0:
+                    print(' ', end='')
+                print(f'{x:.2f} ',end = '')
+            else:
+                print('            ',end = '')
+            print(" ",end = '')
+        print()
 # https://quantumcomputing.stackexchange.com/a/4255 <- math
 #return a matrix that applies gate U to the t'th qubit, controled by the c'th qubit, in an n qubit state 
 def U2(_U, t1, t2, n):
@@ -136,10 +150,11 @@ def parse_braket(dirac):
     vec[-1] = vec[-1].reshape(1,2)
     if len(vec)>2:
         vec = [vec[0]]+[v.reshape(1,1,2) for v in vec[1:-1]]+[vec[-1]]
-    return vec
+    return len(dirac), vec
 
 def parse_state(state_string):
-    return qtn.tensor_1d.MatrixProductState(parse_braket(state_string))
+    x, t = parse_braket(state_string);
+    return x, qtn.tensor_1d.MatrixProductState(t)
 
 def print_state(state, shorten=True, postfix=''):
     state = state.flatten()
@@ -160,9 +175,12 @@ def get_MPO(path, max_bond=None, cutoff=None):
     with open(path, 'r') as out:
         instrs = out.read().splitlines()
     n = int(instrs[0])
+    if n < 2:
+        print("Tensor simpulater does not work for circuits of 1 qubit. Please provide another circuit.")
+        quit()
     MPO = qtn.tensor_builder.MatrixProductOperator(I(n, begining=True, end=True))
     i = 1
-    d = {'H':_H,'X':_X,'I':_I,'S':_S}
+    d = {'H':_H,'X':_X,'I':_I,'S':_S,'s':_s,'Z':_Z,'Y':_Y}
     while i < len(instrs):
         g = None
         is_cond = instrs[i] == 'C'
@@ -179,8 +197,8 @@ def get_MPO(path, max_bond=None, cutoff=None):
         i+= 1
         o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
         o = qtn.tensor_builder.MatrixProductOperator(o)
-        MPO=MPO.apply(o)
-        if (max_bond != None or cutoff != None) and i%5==0:
+        MPO=o.apply(MPO)
+        if (max_bond != None or cutoff != None) and i%1==0:
             MPO.right_compress(max_bond=max_bond, cutoff=cutoff)
             MPO.left_compress(max_bond=max_bond, cutoff=cutoff)
 
@@ -202,9 +220,13 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False,
         raise Exception('reverse not implemented yet')
     n, MPO = get_MPO(path, max_bond=max_bond, cutoff=cutoff)
     if state_string == '':
+        printm(MPO.to_dense())
         enablePrint()
         return MPO
-    state = parse_state(state_string)
+    x, state = parse_state(state_string)
+    if n != x :
+        print(f"Input of {x} qubits was provided. Please provide input state of {n} qubits for this circuit. ")
+        quit()
     if debug:
         print("before:")
         print_state(state.to_dense())

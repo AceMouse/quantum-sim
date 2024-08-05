@@ -12,6 +12,9 @@ _I = np.array([[1,0],[0,1]], dtype=complex)
 _X = np.array([[0,1],[1,0]], dtype=complex)
 _H = (1/math.sqrt(2))*np.array([[1,1],[1,-1]], dtype=complex)
 _S = np.array([[1,0,0,0],[0,0,1,0],[0,1,0,0],[0,0,0,1]], dtype=complex)
+_s = np.array([[1,0],[0,1j]], dtype=complex)
+_Z = np.array([[1,0],[0,-1]], dtype=complex)
+_Y = np.array([[0,-1j],[1j,0]], dtype=complex)
 
 def kron(arr, dtype=complex):
     res = np.array([1],dtype=dtype)
@@ -76,7 +79,7 @@ def parse_braket(dirac):
         else:
             raise Exception(f'Parse Error "{bit}"')
         vec = np.kron(vec, m)
-    return vec
+    return len(dirac), vec
 def parse_state(state_string):
     return parse_braket(state_string)
 
@@ -94,6 +97,17 @@ def measure(state):
 
 def print_measurement(state, shorten=True):
     print_state(np.around(measure(state)*100,decimals=1), shorten, postfix='%')
+def printm(m):
+    for i in m:
+        for x in i:
+            if x != 0j:
+                if x.real >0:
+                    print(' ', end='')
+                print(f'{x:.2f} ',end = '')
+            else:
+                print('            ',end = '')
+            print(" ",end = '')
+        print()
 
 def combine(path):
     with open(path, 'r') as out:
@@ -101,11 +115,14 @@ def combine(path):
     n = int(instrs[0])
     m = I(n)
     i = 1
-    d = {'H':_H,'X':_X,'I':_I,'S':_S}
+    d = {'H':_H,'X':_X,'I':_I,'S':_S,'s':_s,'Z':_Z,'Y':_Y}
     while i < len(instrs):
         g = None
         is_cond = instrs[i] == 'C'
         is_2q = instrs[i] == 'S'
+#        if instrs[i] == 'H':
+#            print('----------------------------')
+#            printm(m)
         i+= is_cond
         if instrs[i] in d:
             g = d[instrs[i]]
@@ -117,7 +134,12 @@ def combine(path):
         t = int(instrs[i])
         i+= 1
         o = C(g,c,t,n) if is_cond else (U2(g,c,t,n) if is_2q else U(g,t,n))
-        m = m@o
+#        printm(m)
+        m = o@m
+#        print('            *               ')
+#        printm(o)
+#        print('----------------------------')
+#    printm(m)
     return n, m
 
 import sys, os
@@ -130,41 +152,6 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-# This is the function we are trying to fit to the data.
-def func(x, a, b, c):
-    return [a*x*x + b*x + c for x in x]
-
-
-import matplotlib.pyplot as plt;
-import scipy.optimize as opt;
-def graph_measurement(state):
-    N, _ = state.shape
-    xdata = [i/N for i in range(N)] 
-    ydata = state.real.flatten()
-
-    # Plot the actual data
-    plt.plot(xdata, ydata, ".", label="real data",linestyle="--");
-
-#    # The actual curve fitting happens here
-#    optimizedParameters, pcov = opt.curve_fit(func, xdata, ydata);
-
-#    # Use the optimized parameters to plot the best fit
-#    plt.plot(xdata, func(xdata, *optimizedParameters), label="real fit");
-    
-    xdata = [i/N for i in range(N)] 
-    ydata = state.imag.flatten()
-
-    # Plot the actual data
-    plt.plot(xdata, ydata, ".", label="imag data",linestyle="-");
-
-#    # The actual curve fitting happens here
-#    optimizedParameters, pcov = opt.curve_fit(func, xdata, ydata);
-
-#    # Use the optimized parameters to plot the best fit
-#    plt.plot(xdata, func(xdata, *optimizedParameters), label="imag fit");
-    # Show the graph
-    plt.legend();
-    plt.show();
 
 def interpret(path, state_string='', reverse = False, debug=False, silent=False):
     if silent:
@@ -173,11 +160,14 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False)
     if reverse:
         m = m.conj().T
     if state_string == '':
+        printm(m)
         enablePrint()
         return m
-    state = parse_state(state_string)
-    if not silent:
-        graph_measurement(state)
+    x, state = parse_state(state_string)
+    if n != x :
+        print(f"Input of {x} qubits was provided. Please provide input state of {n} qubits for this circuit. ")
+        enablePrint()
+        quit()
     if debug:
         print("before:")
         print_state(state)
@@ -187,12 +177,10 @@ def interpret(path, state_string='', reverse = False, debug=False, silent=False)
         print("after:")
         print_state(state)
     print_measurement(state)
-    if not silent:
-        graph_measurement(state)
-    entropy = vn_entropy_from_state(state, n, reverse = reverse, debug = debug)
-    if not debug:
-        print("Von Neumann entropy:")
-        print(entropy)
+    #entropy = vn_entropy_from_state(state, n, reverse = reverse, debug = debug)
+    #if not debug:
+    #    print("Von Neumann entropy:")
+    #    print(entropy)
     enablePrint()
     return state
 
